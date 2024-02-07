@@ -1,0 +1,53 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "test.tmx",
+    "expandedProjectPaths": [
+        "tilesets",
+        "."
+    ],
+    "fileStates": {
+        "test.tmx": {
+            "scale": 2,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 535.75,
+                "y": 412.75
+            }
+        },
+        "tilesets/TilesetFloor.tsx": {
+            "scaleInDock": 1
+        },
+        "tilesets/TilesetFloorDetail.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
+        },
+        "tilesets/TilesetNature.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Backgrounds/Tilesets",
+    "map.height": 30,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "openFiles": [
+        "test.tmx",
+        "tilesets/TilesetFloorDetail.tsx",
+        "tilesets/TilesetNature.tsx"
+    ],
+    "project": "ninjaSouls.tiled-project",
+    "recentFiles": [
+        "tilesets/TilesetNature.tsx",
+        "tilesets/TilesetFloorDetail.tsx",
+        "test.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}
