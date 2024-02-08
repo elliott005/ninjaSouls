@@ -8,7 +8,7 @@ from Player import *
 
 pygame.init()
 
-FPS = 60
+FPS = 30
 fpsClock = pygame.time.Clock()
 WINDOW = pygame.display.set_mode((0, 0))
 BACKGROUNDCOLOR = (100, 100, 220)
@@ -33,7 +33,7 @@ def main():
         
         dt = fpsClock.get_time() / 1000
         player.update(dt, walls)
-        mapSprites.update(player.rect.topleft)
+        # mapSprites.update(player.rect.topleft)
         
         WINDOW.fill(BACKGROUNDCOLOR)
         mapSprites.draw(WINDOW, player.rect.center, player.zoom)
@@ -47,7 +47,7 @@ def main():
 
         mapSpritesFront.draw(WINDOW, player.rect.center, player.zoom)
 
-        print(fpsClock.get_fps())
+        # print(fpsClock.get_fps())
 
         pygame.display.update()
         fpsClock.tick(FPS)
