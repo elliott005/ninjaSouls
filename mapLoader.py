@@ -38,6 +38,7 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
     sprite_group = extendedGroup()
     sprite_group_front = extendedGroup()
     walls = []
+    musicAreas = {}
     enemiesGroup = extendedGroup()
     tilesets = {}
     k = pygame.math.Vector2(sizeX / mapTileSize.x, sizeY / mapTileSize.y)
@@ -60,5 +61,9 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
         elif layer.name == "Walls":
             for obj in layer:
                 walls.append(pygame.Rect(obj.x * k.x, obj.y * k.y, obj.width * k.x, obj.height * k.y))
-
-    return sprite_group, sprite_group_front, enemiesGroup, walls
+        elif layer.name == "Music":
+            for obj in layer:
+                if not obj.name in musicAreas:
+                    musicAreas[obj.name] = []
+                musicAreas[obj.name].append(pygame.Rect(obj.x * k.x, obj.y * k.y, obj.width * k.x, obj.height * k.y))
+    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas

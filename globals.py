@@ -42,3 +42,9 @@ class Timer:
     def stop(self):
         self.active == False
         self.time = self.waitTime
+
+def collidedictlist(p_rect, p_dict):
+    for k in p_dict:
+        if p_rect.collidelist(p_dict[k]) != -1:
+            return k
+    return "none"
