@@ -2,10 +2,6 @@ import pygame, sys
 from pygame.locals import *
 from pytmx.util_pygame import load_pygame
 
-from inputs import *
-from mapLoader import *
-from Player import *
-
 pygame.init()
 
 FPS = 30
@@ -13,18 +9,25 @@ fpsClock = pygame.time.Clock()
 WINDOW = pygame.display.set_mode((0, 0))
 BACKGROUNDCOLOR = (100, 100, 220)
 
+from inputs import *
+from mapLoader import *
+from Player import *
+
 def main():
-    mapTileSize = pygame.math.Vector2(16, 16)
     mapPath = "maps/test.tmx"
     mapData = load_pygame(mapPath)
     scaleTo = (64, 64)
-    mapSprites, mapSpritesFront, walls = loadMap(mapData, scaleTo[0], scaleTo[1], mapTileSize)
+    mapSprites, mapSpritesFront, enemiesGroup, walls = loadMap(mapData, scaleTo[0], scaleTo[1], mapTileSize)
 
     # mapSize = (scaleTo[0] * 60, scaleTo[1] * 60)
 
     player = Player((100, 100), (64, 64))
+    dead = False
 
     while 1:
+        if dead:
+            pygame.quit()
+            sys.exit()
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if checkInputKey(event.key, "quit"):
@@ -32,7 +35,8 @@ def main():
                     sys.exit()
         
         dt = fpsClock.get_time() / 1000
-        player.update(dt, walls)
+        dead = player.update(dt, walls, enemiesGroup)
+        enemiesGroup.update(dt, pygame.math.Vector2(player.rect.left, player.rect.top), walls, playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1)
         # mapSprites.update(player.rect.topleft)
         
         WINDOW.fill(BACKGROUNDCOLOR)
@@ -44,10 +48,13 @@ def main():
         # pygame.draw.rect(WINDOW, (100, 200, 200), player.rect)
 
         player.draw(WINDOW)
+        enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
 
         mapSpritesFront.draw(WINDOW, player.rect.center, player.zoom)
 
         # print(fpsClock.get_fps())
+
+        player.drawHUD(WINDOW)
 
         pygame.display.update()
         fpsClock.tick(FPS)

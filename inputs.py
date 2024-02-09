@@ -5,7 +5,8 @@ inputs = {
     "moveLeft": [K_LEFT],
     "moveRight": [K_RIGHT],
     "moveUp": [K_UP],
-    "moveDown": [K_DOWN]
+    "moveDown": [K_DOWN],
+    "attack": [K_SPACE]
 }
 
 def checkInput(keysPressed, action):

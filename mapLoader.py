@@ -1,5 +1,6 @@
 import pygame, math
 from pygame.surface import Surface
+from Enemy import Enemy
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, pos, size, surf, gid, groups):
@@ -37,6 +38,8 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
     sprite_group = extendedGroup()
     sprite_group_front = extendedGroup()
     walls = []
+    enemiesGroup = extendedGroup()
+    tilesets = {}
     k = pygame.math.Vector2(sizeX / mapTileSize.x, sizeY / mapTileSize.y)
     for idx, layer in enumerate(data.visible_layers):
         # print(layer.__dict__)
@@ -44,6 +47,12 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
             if layer.name == "ObjectsFront":
                 for x, y, surf in layer.tiles():
                     Tile((x * sizeX, y * sizeY), (sizeX, sizeY), surf, data.get_tile_gid(x, y, idx), sprite_group_front)
+            elif layer.name == "Enemies":
+                for x, y, surf in layer.tiles():
+                    gid = data.get_tile_gid(x, y, idx)
+                    if not gid in tilesets:
+                        tilesets[gid] = data.get_tileset_from_gid(gid)
+                    Enemy((x * sizeX, y * sizeY), (sizeX, sizeY), tilesets[gid].name, gid, enemiesGroup)
             else:
                 for x, y, surf in layer.tiles():
                     # print(data.get_tile_gid(x, y, idx))
@@ -52,4 +61,4 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
             for obj in layer:
                 walls.append(pygame.Rect(obj.x * k.x, obj.y * k.y, obj.width * k.x, obj.height * k.y))
 
-    return sprite_group, sprite_group_front, walls
+    return sprite_group, sprite_group_front, enemiesGroup, walls
