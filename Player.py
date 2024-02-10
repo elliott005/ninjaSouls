@@ -15,6 +15,7 @@ class Player():
 
         self.zoomMin = 0.6
         self.zoomSpeed = 0.25
+        self.zoomSpeedInCombat = 0.5
         self.zoom = 1
 
         spriteSize = mapTileSize.x
@@ -112,7 +113,7 @@ class Player():
         self.sounds["attack"].set_volume(0.3)
         self.sounds["hit"].set_volume(0.3)
     
-    def update(self, dt, walls, enemiesGroup):
+    def update(self, dt, walls, enemiesGroup, inCombat):
         keysPressed = pygame.key.get_pressed()
         input = pygame.math.Vector2(checkInput(keysPressed, "moveRight") - checkInput(keysPressed, "moveLeft"), checkInput(keysPressed, "moveDown") - checkInput(keysPressed, "moveUp"))
         
@@ -125,7 +126,7 @@ class Player():
 
         self.handleDamage(enemiesGroup)
 
-        self.updateZoom(dt)
+        self.updateZoom(dt, inCombat)
         self.updateTimers(dt)
 
         if self.health < 1:
@@ -255,15 +256,18 @@ class Player():
         if self.currentFrame >= self.animations[self.animation]["max"]:
             self.currentFrame = 0.0
     
-    def updateZoom(self, dt):
-        if not self.velocity.length() and not self.attacking:
+    def updateZoom(self, dt, inCombat):
+        if not self.velocity.length() and not self.attacking and not inCombat:
             if not self.timers["zoomOut"].active:
                 self.zoom = max(self.zoom - dt * self.zoomSpeed, self.zoomMin)
             else:
                 self.zoom = min(self.zoom + dt * self.zoomSpeed, 1)
         else:
             self.timers["zoomOut"].start()
-            self.zoom = min(self.zoom + dt * self.zoomSpeed, 1)
+            if inCombat:
+                self.zoom = min(self.zoom + dt * self.zoomSpeedInCombat, 1)
+            else:
+                self.zoom = min(self.zoom + dt * self.zoomSpeed, 1)
     
     def handleDamage(self, enemiesGroup):
         if self.timers["grace"].active or self.dead: return

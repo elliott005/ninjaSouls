@@ -10,12 +10,32 @@
     ],
     "file.lastUsedOpenFilter": "Tous les Fichiers (*)",
     "fileStates": {
-        "test.tmx": {
-            "scale": 2,
-            "selectedLayer": 4,
+        "subAreas/Interior1.tmx": {
+            "expandedObjectLayers": [
+                7,
+                6,
+                5,
+                8
+            ],
+            "scale": 5.442708333333333,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 178.75,
-                "y": 183.75
+                "x": 115.7511961722488,
+                "y": 120.0688995215311
+            }
+        },
+        "test.tmx": {
+            "expandedObjectLayers": [
+                7,
+                6,
+                3,
+                8
+            ],
+            "scale": 2,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 368.5,
+                "y": 271.75
             }
         },
         "tilesets/Beast.tsx": {
@@ -39,11 +59,12 @@
         }
     },
     "last.externalTilesetPath": "/home/elliott/Documents/python_programs/games/ninjaSouls/maps/tilesets",
-    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Actor/Monsters/Slime",
-    "map.height": 30,
+    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Backgrounds/Tilesets/Interior",
+    "map.height": 15,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,
     "map.tileWidth": 16,
+    "map.width": 15,
     "openFiles": [
         "test.tmx",
         "tilesets/TilesetFloorDetail.tsx",

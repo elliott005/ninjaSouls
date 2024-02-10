@@ -49,3 +49,22 @@ def collidedictlist(p_rect, p_dict):
         if p_rect.collidelist(p_dict[k]) != -1:
             return k
     return "none"
+
+def transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="rect", dir=1, background=None):
+    windowSize = pygame.display.get_window_size()
+    if type == "rect":
+        rect = pygame.Rect(-windowSize[0], 0, windowSize[0], windowSize[1])
+        if dir < 0:
+            rect.x = 0
+        while 1:
+            if rect.x > 0 and dir == 1:
+                break
+            elif rect.x > windowSize[0] and dir == -1:
+                break
+            dt = fpsClock.get_time() / 1000
+            rect.x += dt * 500
+            if not background is None:
+                WINDOW.fill(BACKGROUNDCOLOR)
+                WINDOW.blit(background, (0, 0))
+            pygame.draw.rect(WINDOW, (0, 0, 0), rect)
+            pygame.display.update()

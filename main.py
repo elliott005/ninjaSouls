@@ -14,10 +14,11 @@ from mapLoader import *
 from Player import *
 
 def main():
-    mapPath = "maps/test.tmx"
-    mapData = load_pygame(mapPath)
+    overworldMapPath = "maps/test.tmx"
+    mapData = load_pygame(overworldMapPath)
     scaleTo = (64, 64)
-    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas = loadMap(mapData, scaleTo[0], scaleTo[1], mapTileSize)
+    k = pygame.math.Vector2(scaleTo[0] / mapTileSize.x, scaleTo[1] / mapTileSize.y)
+    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = loadMap(mapData, scaleTo[0], scaleTo[1], mapTileSize)
 
     # mapSize = (scaleTo[0] * 60, scaleTo[1] * 60)
 
@@ -43,7 +44,7 @@ def main():
                     sys.exit()
         
         musicArea = collidedictlist(player.rect, musicAreas)
-        # print(musicArea, whichMusic)
+        # print(musicArea, whichMusic, whichMusic != musicArea)
         if whichMusic != musicArea and not playerInCombat and not player.dead:
             if whichMusic == "none":
                 whichMusic = musicArea
@@ -54,8 +55,10 @@ def main():
                 whichMusic = musicArea
                 music[whichMusic].play(loops=-1, fade_ms=1000)
 
-        dt = fpsClock.get_time() / 1000
-        dead = player.update(dt, walls, enemiesGroup)
+        dt = pygame.math.clamp(fpsClock.get_time() / 1000, 0, 0.05)
+        
+        dead = player.update(dt, walls, enemiesGroup, playerInCombat)
+
         enemiesGroup.update(dt, pygame.math.Vector2(player.rect.left, player.rect.top), walls, playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1)
         playerInCombat = False
         if player.dead:
@@ -82,10 +85,26 @@ def main():
                             music[whichMusic].play(-1, fade_ms=500)
                     music["fight"].fadeout(500)
         
+        doorEntered = collidedictlist(player.rect, doorAreas)
+        if doorEntered != "none":
+            transition(WINDOW, fpsClock, BACKGROUNDCOLOR)
+            if "Overworld" in doorEntered:
+                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+                player.rect.topleft = doorDestinations[doorEntered]
+            else:
+                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = changeMap("maps/subAreas/" + doorEntered + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+                player.rect.topleft = doorDestinations[doorEntered]
+            
+            WINDOW.fill(BACKGROUNDCOLOR)
+            mapSprites.draw(WINDOW, player.rect.center, player.zoom)
+            player.draw(WINDOW)
+            enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
+            mapSpritesFront.draw(WINDOW, player.rect.center, player.zoom)
+            player.drawHUD(WINDOW)
+            transition(WINDOW, fpsClock, BACKGROUNDCOLOR, dir=-1, background=WINDOW.copy())
         # mapSprites.update(player.rect.topleft)
         
         WINDOW.fill(BACKGROUNDCOLOR)
-        mapSprites.draw(WINDOW, player.rect.center, player.zoom)
 
         # for wall in walls:
         #     pygame.draw.rect(WINDOW, (100, 100, 100), wall)#pygame.Rect((wall.x - player.rect.x, wall.y - player.rect.y), (wall.width, wall.height)))
@@ -94,6 +113,8 @@ def main():
         #     for i in musicAreas[k]:
         #         pygame.draw.rect(WINDOW, (100, 100, 100), i)
         # pygame.draw.rect(WINDOW, (100, 200, 200), player.rect)
+
+        mapSprites.draw(WINDOW, player.rect.center, player.zoom)
 
         player.draw(WINDOW)
         enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)

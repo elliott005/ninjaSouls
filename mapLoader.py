@@ -1,6 +1,7 @@
 import pygame, math
 from pygame.surface import Surface
 from Enemy import Enemy
+from pytmx.util_pygame import load_pygame
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, pos, size, surf, gid, groups):
@@ -34,11 +35,18 @@ class extendedGroup(pygame.sprite.Group):
                         self.spritedict[spr] = surface_blit(scaledImgs[spr.gid], pos)
         self.lostsprites = []
 
+def changeMap(whichMap, sizeX, sizeY, mapTileSize):
+    data = load_pygame(whichMap)
+    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = loadMap(data, sizeX, sizeY, mapTileSize)
+    return mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations
+
 def loadMap(data, sizeX, sizeY, mapTileSize):
     sprite_group = extendedGroup()
     sprite_group_front = extendedGroup()
     walls = []
     musicAreas = {}
+    doorAreas = {}
+    doorDestinations = {}
     enemiesGroup = extendedGroup()
     tilesets = {}
     k = pygame.math.Vector2(sizeX / mapTileSize.x, sizeY / mapTileSize.y)
@@ -66,4 +74,12 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
                 if not obj.name in musicAreas:
                     musicAreas[obj.name] = []
                 musicAreas[obj.name].append(pygame.Rect(obj.x * k.x, obj.y * k.y, obj.width * k.x, obj.height * k.y))
-    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas
+        elif layer.name == "Doors":
+            for obj in layer:
+                if not obj.name in doorAreas:
+                    doorAreas[obj.name] = []
+                doorAreas[obj.name].append(pygame.Rect(obj.x * k.x, obj.y * k.y, obj.width * k.x, obj.height * k.y))
+        elif layer.name == "DoorDestinations":
+            for obj in layer:
+                doorDestinations[obj.name] = (obj.x * k.x, obj.y * k.y)
+    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations
