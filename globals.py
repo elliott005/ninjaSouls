@@ -1,6 +1,7 @@
 import pygame
 
 mapTileSize = pygame.math.Vector2(16, 16)
+size = (64, 64)
 
 def clamp(n, p_min, p_max):
     if p_max > p_min:

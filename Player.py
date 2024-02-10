@@ -13,7 +13,7 @@ class Player():
         self.acceleration = 750
         self.friction = 1250
 
-        self.zoomMin = 0.5
+        self.zoomMin = 0.6
         self.zoomSpeed = 0.25
         self.zoom = 1
 
@@ -51,7 +51,7 @@ class Player():
             "dead": {
                 "all": [pygame.transform.scale(spriteSheetDeath.subsurface(pygame.Rect(deathSize * x, deathSize * 0, deathSize, deathSize)), size) for x in range(0, 4)],
                 "max": 4,
-                "speed": 6
+                "speed": 2
             }
         }
 
@@ -61,8 +61,9 @@ class Player():
         # self.directionVector = pygame.math.Vector2(0, 1)
 
         heartSpriteSheet = pygame.image.load("assets/NinjaAdventure/HUD/Heart.png").convert_alpha()
-        heartSize = 16
-        self.heartSprites = [pygame.transform.scale(heartSpriteSheet.subsurface(pygame.Rect(heartSize * x, heartSize * 0, heartSize, heartSize)), size) for x in range(0, 5)]
+        heartSpriteSize = 16
+        self.heartSize = (128, 128)
+        self.heartSprites = [pygame.transform.scale(heartSpriteSheet.subsurface(pygame.Rect(heartSpriteSize * x, heartSpriteSize * 0, heartSpriteSize, heartSpriteSize)), self.heartSize) for x in range(0, 5)]
 
 
         self.timers = {
@@ -102,6 +103,14 @@ class Player():
 
         self.dead = False
         self.startDeathTimerOnce = False
+
+        self.sounds = {
+            "attack": pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/Sword2.wav"),
+            "gameOver": pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/GameOver.wav"),
+            "hit": pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/Explosion.wav"),
+        }
+        self.sounds["attack"].set_volume(0.3)
+        self.sounds["hit"].set_volume(0.3)
     
     def update(self, dt, walls, enemiesGroup):
         keysPressed = pygame.key.get_pressed()
@@ -122,6 +131,7 @@ class Player():
         if self.health < 1:
             self.dead = True
             if not self.startDeathTimerOnce:
+                self.sounds["gameOver"].play()
                 self.timers["death"].start()
             self.startDeathTimerOnce = True
             if not self.timers["death"].active:
@@ -201,6 +211,7 @@ class Player():
             self.attacking = True
             self.timers["attack"].start()
             self.timers["attackCooldown"].start()
+            self.sounds["attack"].play()
         if self.timers["attack"].active:
             self.changeAnimation("attack")
             if self.direction == "left" or self.direction == "right":
@@ -255,20 +266,23 @@ class Player():
             self.zoom = min(self.zoom + dt * self.zoomSpeed, 1)
     
     def handleDamage(self, enemiesGroup):
-        if self.timers["grace"].active: return
+        if self.timers["grace"].active or self.dead: return
         hit_list = pygame.sprite.spritecollide(self, enemiesGroup, False)
         hit = False
         for sprite in hit_list:
-            if sprite.dead: continue
-            if not self.velocity.length():
+            if sprite.dead or sprite.timers["attackCooldown"].active: continue
+            if self.velocity.length() < SQRT2:
                 self.velocity.x = 1
             self.velocity.rotate_ip(self.velocity.angle_to((self.rect.x - sprite.rect.x, self.rect.y - sprite.rect.y)))
             self.velocity = self.velocity.normalize() * self.knockback
             hit = True
+            damage = sprite.damage
+            sprite.timers["attackCooldown"].start()
         
         if hit:
+            self.sounds["hit"].play()
             self.timers["grace"].start()
-            self.health -= 1
+            self.health -= damage
     
     def handleHealth(self, WINDOW):
         heartsOver = self.health % 4
@@ -277,16 +291,16 @@ class Player():
         maxHearts = self.maxHealth // 4
         for i in range(maxHearts):
             if i < fullHearts:
-                WINDOW.blit(self.heartSprites[0], (i * self.rect.width, 0))
+                WINDOW.blit(self.heartSprites[0], (i * self.heartSize[0], 0))
             elif fullHearts == i and heartsOver:
                 if heartsOver == 3:
-                    WINDOW.blit(self.heartSprites[1], (i * self.rect.width, 0))
+                    WINDOW.blit(self.heartSprites[1], (i * self.heartSize[0], 0))
                 elif heartsOver == 2:
-                    WINDOW.blit(self.heartSprites[2], (i * self.rect.width, 0))
+                    WINDOW.blit(self.heartSprites[2], (i * self.heartSize[0], 0))
                 else:
-                    WINDOW.blit(self.heartSprites[3], (i * self.rect.width, 0))
+                    WINDOW.blit(self.heartSprites[3], (i * self.heartSize[0], 0))
             else:
-                WINDOW.blit(self.heartSprites[4], (i * self.rect.width, 0))
+                WINDOW.blit(self.heartSprites[4], (i * self.heartSize[0], 0))
 
     
     def updateTimers(self, dt):

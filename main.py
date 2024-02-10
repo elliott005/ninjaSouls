@@ -24,11 +24,13 @@ def main():
     music = {
         "adventureBegins": pygame.mixer.Sound("assets/NinjaAdventure/Musics/1 - Adventure Begin.ogg"),
         "theCave": pygame.mixer.Sound("assets/NinjaAdventure/Musics/2 - The Cave.ogg"),
+        "fight": pygame.mixer.Sound("assets/NinjaAdventure/Musics/17 - Fight.ogg"),
     }
     whichMusic = "none"
 
     player = Player((100, 100), (64, 64))
     dead = False
+    playerInCombat = False
 
     while 1:
         if dead:
@@ -42,7 +44,7 @@ def main():
         
         musicArea = collidedictlist(player.rect, musicAreas)
         # print(musicArea, whichMusic)
-        if whichMusic != musicArea:
+        if whichMusic != musicArea and not playerInCombat and not player.dead:
             if whichMusic == "none":
                 whichMusic = musicArea
             else:
@@ -55,6 +57,31 @@ def main():
         dt = fpsClock.get_time() / 1000
         dead = player.update(dt, walls, enemiesGroup)
         enemiesGroup.update(dt, pygame.math.Vector2(player.rect.left, player.rect.top), walls, playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1)
+        playerInCombat = False
+        if player.dead:
+            if whichMusic != "none":
+                if music[whichMusic].get_num_channels() != 0:
+                    music[whichMusic].fadeout(200)
+            if music["fight"].get_num_channels() != 0:
+                music["fight"].fadeout(200)
+        else:
+            for enemy in enemiesGroup.sprites():
+                if enemy.aggro:
+                    playerInCombat = True
+                    break
+            if playerInCombat:
+                if music["fight"].get_num_channels() == 0:
+                    if whichMusic != "none":
+                        if music[whichMusic].get_num_channels() != 0:
+                            music[whichMusic].fadeout(500)
+                    music["fight"].play(-1, fade_ms=500)
+            else:
+                if music["fight"].get_num_channels() != 0:
+                    if whichMusic != "none":
+                        if music[whichMusic].get_num_channels() == 0:
+                            music[whichMusic].play(-1, fade_ms=500)
+                    music["fight"].fadeout(500)
+        
         # mapSprites.update(player.rect.topleft)
         
         WINDOW.fill(BACKGROUNDCOLOR)

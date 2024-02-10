@@ -5,18 +5,22 @@
     },
     "activeFile": "test.tmx",
     "expandedProjectPaths": [
-        "tilesets",
-        "."
+        ".",
+        "tilesets"
     ],
     "file.lastUsedOpenFilter": "Tous les Fichiers (*)",
     "fileStates": {
         "test.tmx": {
             "scale": 2,
-            "selectedLayer": 0,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 535.25,
-                "y": 412.25
+                "x": 178.75,
+                "y": 183.75
             }
+        },
+        "tilesets/Beast.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "tilesets/FacesetBeast.tsx": {
             "scaleInDock": 1,
@@ -35,7 +39,7 @@
         }
     },
     "last.externalTilesetPath": "/home/elliott/Documents/python_programs/games/ninjaSouls/maps/tilesets",
-    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Actor/Monsters/Beast",
+    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Actor/Monsters/Slime",
     "map.height": 30,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,
@@ -43,14 +47,16 @@
     "openFiles": [
         "test.tmx",
         "tilesets/TilesetFloorDetail.tsx",
-        "tilesets/TilesetNature.tsx"
+        "tilesets/TilesetNature.tsx",
+        "tilesets/Beast.tsx"
     ],
     "project": "ninjaSouls.tiled-project",
     "recentFiles": [
-        "tilesets/FacesetBeast.tsx",
+        "tilesets/Beast.tsx",
         "tilesets/TilesetNature.tsx",
         "tilesets/TilesetFloorDetail.tsx",
-        "test.tmx"
+        "test.tmx",
+        "tilesets/FacesetBeast.tsx"
     ],
     "tileset.lastUsedFilter": "Fichiers de jeu de tuiles Tiled (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx",
