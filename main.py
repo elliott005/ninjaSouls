@@ -12,13 +12,13 @@ BACKGROUNDCOLOR = (100, 100, 220)
 from inputs import *
 from mapLoader import *
 from Player import *
+from Enemy import *
 
 def main():
     overworldMapPath = "maps/test.tmx"
     mapData = load_pygame(overworldMapPath)
     scaleTo = (64, 64)
     k = pygame.math.Vector2(scaleTo[0] / mapTileSize.x, scaleTo[1] / mapTileSize.y)
-    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = loadMap(mapData, scaleTo[0], scaleTo[1], mapTileSize)
 
     # mapSize = (scaleTo[0] * 60, scaleTo[1] * 60)
 
@@ -33,15 +33,26 @@ def main():
     dead = False
     playerInCombat = False
 
+    enemies, area, worldSave = loadGame(player, Enemy)
+    
+    if area == "Overworld":
+        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+    else:
+        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+
+    if enemies != -1:
+        enemiesGroup = enemies
+    # print()
+    # for enemy in enemiesGroup.sprites():
+    #     print(enemy.trulyDead)
+    
     while 1:
         if dead:
-            pygame.quit()
-            sys.exit()
+            quitgame(player, enemiesGroup.sprites(), area, worldSave)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if checkInputKey(event.key, "quit"):
-                    pygame.quit()
-                    sys.exit()
+                    quitgame(player, enemiesGroup.sprites(), area, worldSave)
         
         musicArea = collidedictlist(player.rect, musicAreas)
         # print(musicArea, whichMusic, whichMusic != musicArea)
@@ -69,7 +80,7 @@ def main():
                 music["fight"].fadeout(200)
         else:
             for enemy in enemiesGroup.sprites():
-                if enemy.aggro:
+                if enemy.aggro and not enemy.trulyDead:
                     playerInCombat = True
                     break
             if playerInCombat:
@@ -87,21 +98,28 @@ def main():
         
         doorEntered = collidedictlist(player.rect, doorAreas)
         if doorEntered != "none":
-            transition(WINDOW, fpsClock, BACKGROUNDCOLOR)
+            transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle")
+            # print("area: ", area)
+            saveGame(player, enemiesGroup.sprites(), area, worldSave)
             if "Overworld" in doorEntered:
                 mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
                 player.rect.topleft = doorDestinations[doorEntered]
+                enemies, area, worldSave = loadGame(player, Enemy, "Overworld")
             else:
                 mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = changeMap("maps/subAreas/" + doorEntered + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
                 player.rect.topleft = doorDestinations[doorEntered]
+                enemies, area, worldSave = loadGame(player, Enemy, doorEntered)
             
+            if enemies != -1:
+                enemiesGroup = enemies
+
             WINDOW.fill(BACKGROUNDCOLOR)
             mapSprites.draw(WINDOW, player.rect.center, player.zoom)
             player.draw(WINDOW)
             enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
             mapSpritesFront.draw(WINDOW, player.rect.center, player.zoom)
             player.drawHUD(WINDOW)
-            transition(WINDOW, fpsClock, BACKGROUNDCOLOR, dir=-1, background=WINDOW.copy())
+            transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle", dir=-1, background=WINDOW.copy())
         # mapSprites.update(player.rect.topleft)
         
         WINDOW.fill(BACKGROUNDCOLOR)
@@ -125,6 +143,11 @@ def main():
 
         pygame.display.update()
         fpsClock.tick(FPS)
+
+def quitgame(player, enemies, area, worldSave):
+    saveGame(player, enemies, area, worldSave)
+    pygame.quit()
+    sys.exit()
 
 if __name__ == "__main__":
     main()

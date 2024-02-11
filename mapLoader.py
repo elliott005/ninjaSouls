@@ -18,6 +18,7 @@ class extendedGroup(pygame.sprite.Group):
         zoom = round(p_zoom, 2)
         if zoom == 1:
             for spr in sprites:
+                if hasattr(spr, "trulyDead") and spr.trulyDead: continue
                 topleft = spr.rect.topleft
                 pos = (topleft[0] - playerPos[0] + windowSize[0] / 2, topleft[1] - playerPos[1] + windowSize[1] / 2)
                 if -spr.rect.width < pos[0] < windowSize[0] and -spr.rect.height < pos[1] < windowSize[1]:
@@ -25,14 +26,16 @@ class extendedGroup(pygame.sprite.Group):
         else:
             scaledImgs = {}
             for spr in sprites:
+                if hasattr(spr, "trulyDead") and spr.trulyDead: continue
                 topleft = spr.rect.topleft
                 pos = (math.floor((topleft[0] - playerPos[0]) * zoom + windowSize[0] / 2), math.floor((topleft[1] - playerPos[1]) * zoom + windowSize[1] / 2))
                 if -spr.rect.width < pos[0] < windowSize[0] and -spr.rect.height < pos[1] < windowSize[1]:
-                    if spr.gid in scaledImgs:
-                        self.spritedict[spr] = surface_blit(scaledImgs[spr.gid], pos)
+                    bytesStr = pygame.image.tobytes(spr.image, "RGB")
+                    if bytesStr in scaledImgs:
+                        self.spritedict[spr] = surface_blit(scaledImgs[bytesStr], pos)
                     else:
-                        scaledImgs[spr.gid] = pygame.transform.scale(spr.image, (math.ceil(spr.rect.width * zoom), math.ceil(spr.rect.height * zoom)))
-                        self.spritedict[spr] = surface_blit(scaledImgs[spr.gid], pos)
+                        scaledImgs[bytesStr] = pygame.transform.scale(spr.image, (math.ceil(spr.rect.width * zoom), math.ceil(spr.rect.height * zoom)))
+                        self.spritedict[spr] = surface_blit(scaledImgs[bytesStr], pos)
         self.lostsprites = []
 
 def changeMap(whichMap, sizeX, sizeY, mapTileSize):
@@ -61,7 +64,7 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
                     gid = data.get_tile_gid(x, y, idx)
                     if not gid in tilesets:
                         tilesets[gid] = data.get_tileset_from_gid(gid)
-                    Enemy((x * sizeX, y * sizeY), (sizeX, sizeY), tilesets[gid].name, gid, enemiesGroup)
+                    Enemy((x * sizeX, y * sizeY), (sizeX, sizeY), tilesets[gid].name, False, enemiesGroup)
             else:
                 for x, y, surf in layer.tiles():
                     # print(data.get_tile_gid(x, y, idx))

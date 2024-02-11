@@ -64,9 +64,8 @@ class Enemy(pygame.sprite.Sprite):
             "hit": pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/Hit.wav"),
             "dead": pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/Kill.wav")
         }
-    def __init__(self, pos, size, type, gid, groups):
+    def __init__(self, pos, size, type, dead, groups):
         super().__init__(groups)
-        self.gid = gid
         self.type = type
         self.rect = pygame.Rect(pos, size)
         self.animations = self.animationsTypes[self.type]
@@ -97,7 +96,11 @@ class Enemy(pygame.sprite.Sprite):
             self.knockBack = self.maxSpeed * 3
             self.activeDistance = 600.0
 
-        self.dead = False
+        self.dead = dead
+        self.trulyDead = dead
+
+        # if self.dead:
+        #     self.kill()
 
         self.timers = {
             "death": Timer(self.animations["dead"]["max"] / self.animations["dead"]["speed"]),
@@ -110,6 +113,8 @@ class Enemy(pygame.sprite.Sprite):
         self.aggro = False
     
     def update(self, dt, playerPos, walls, playerAttackHitbox = -1, *args: Any, **kwargs: Any) -> None:
+        # print(self.trulyDead)
+        if self.trulyDead: return
         super().update(*args, **kwargs)
         input = pygame.math.Vector2(0, 0)
         if not self.dead:
@@ -140,7 +145,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.timers["death"].start()
             self.startTimerOnce = True
             if not self.timers["death"].active:
-                self.kill()
+                self.trulyDead = True
             
     
     def handleAcceleration(self, dt, input):

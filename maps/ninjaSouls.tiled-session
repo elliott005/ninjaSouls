@@ -6,55 +6,84 @@
     "activeFile": "test.tmx",
     "expandedProjectPaths": [
         ".",
+        "subAreas",
         "tilesets"
     ],
     "file.lastUsedOpenFilter": "Tous les Fichiers (*)",
     "fileStates": {
         "subAreas/Interior1.tmx": {
             "expandedObjectLayers": [
-                7,
+                8,
                 6,
                 5,
-                8
+                7
             ],
             "scale": 5.442708333333333,
             "selectedLayer": 6,
             "viewCenter": {
-                "x": 115.7511961722488,
-                "y": 120.0688995215311
+                "x": 108.95311004784688,
+                "y": 119.88516746411483
+            }
+        },
+        "subAreas/Interior2.tmx": {
+            "scale": 5.442708333333333,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 103.80861244019138,
+                "y": 119.88516746411483
             }
         },
         "test.tmx": {
             "expandedObjectLayers": [
-                7,
+                8,
                 6,
-                3,
-                8
+                7,
+                3
             ],
             "scale": 2,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 368.5,
-                "y": 271.75
+                "x": 368.25,
+                "y": 271.25
             }
         },
         "tilesets/Beast.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 1.5,
             "scaleInEditor": 1
         },
         "tilesets/FacesetBeast.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "tilesets/Slime.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
+        },
         "tilesets/TilesetFloor.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 1.5
         },
         "tilesets/TilesetFloorDetail.tsx": {
             "scaleInDock": 1.5,
             "scaleInEditor": 1
         },
+        "tilesets/TilesetHouse.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
+        },
+        "tilesets/TilesetInterior.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
+        },
+        "tilesets/TilesetInteriorFloor.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
+        },
         "tilesets/TilesetNature.tsx": {
             "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tilesets/TilesetWallSimple.tsx": {
+            "scaleInDock": 1.5,
             "scaleInEditor": 1
         }
     },
@@ -67,15 +96,28 @@
     "map.width": 15,
     "openFiles": [
         "test.tmx",
+        "subAreas/Interior1.tmx",
         "tilesets/TilesetFloorDetail.tsx",
         "tilesets/TilesetNature.tsx",
-        "tilesets/Beast.tsx"
+        "tilesets/Beast.tsx",
+        "tilesets/Slime.tsx",
+        "tilesets/TilesetHouse.tsx",
+        "tilesets/TilesetInterior.tsx",
+        "tilesets/TilesetInteriorFloor.tsx",
+        "tilesets/TilesetWallSimple.tsx"
     ],
     "project": "ninjaSouls.tiled-project",
     "recentFiles": [
+        "subAreas/Interior2.tmx",
+        "tilesets/TilesetWallSimple.tsx",
+        "tilesets/TilesetInteriorFloor.tsx",
+        "tilesets/TilesetInterior.tsx",
+        "tilesets/TilesetHouse.tsx",
+        "tilesets/Slime.tsx",
         "tilesets/Beast.tsx",
         "tilesets/TilesetNature.tsx",
         "tilesets/TilesetFloorDetail.tsx",
+        "subAreas/Interior1.tmx",
         "test.tmx",
         "tilesets/FacesetBeast.tsx"
     ],
