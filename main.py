@@ -48,6 +48,7 @@ def main():
     
     while 1:
         if dead:
+            player.health = player.maxHealth
             quitgame(player, enemiesGroup.sprites(), area, worldSave)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
