@@ -338,7 +338,7 @@ class Player():
                 if heartsOver == 3:
                     WINDOW.blit(self.heartSprites[1], (i * self.heartSize[0], 0))
                 elif heartsOver == 2:
-                    WINDOW.blit(self.heartSprites[2], (i * self.heartSize[0]))
+                    WINDOW.blit(self.heartSprites[2], (i * self.heartSize[0], 0))
                 else:
                     WINDOW.blit(self.heartSprites[3], (i * self.heartSize[0], 0))
             else:
