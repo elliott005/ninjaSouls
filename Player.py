@@ -1,4 +1,4 @@
-import pygame, math
+import pygame, math, random
 from inputs import *
 from globals import *
 
@@ -121,6 +121,12 @@ class Player():
         self.talking = False
         self.talkingIndex = 0
         self.talkSpeed = 15
+        self.talkSpeedNormal = self.talkSpeed
+        self.talkSpeedFast = 120
+        self.talkSounds = [pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/Voice4.wav"), 
+                           pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/Voice1.wav"),
+                           pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/Voice3.wav"),
+                           pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/Voice2.wav")]
         self.dialogueText = ""
         self.talkInputOnce = False
         self.NPCFace = -1
@@ -135,7 +141,7 @@ class Player():
         attackInput = checkInput(keysPressed, "attack")
         if not self.dead:
             self.handleAcceleration(dt, input)
-            self.move(dt, walls, NPCs)
+            self.move(dt, walls)
             self.handleAttack(attackInput)
         self.updateAnimations(dt, input)
 
@@ -224,17 +230,17 @@ class Player():
         if input.x != 0 and input.y != 0 and self.velocity.length():
             self.velocity.scale_to_length(self.velocity.length() - self.acceleration * dt / SQRT2)
     
-    def move(self, dt, walls, NPCs):
+    def move(self, dt, walls):
         if self.velocity.length() != 0:
             if self.timers["grace"].active:
                 moveBy = self.velocity * dt
             else:
                 moveBy = self.velocity.normalize() * min(self.velocity.length(), self.maxSpeed) * dt
             movedRect = self.rect.move(moveBy.x, 0)
-            if movedRect.collidelist(walls) == -1 and collideClassList(movedRect, NPCs) == -1:
+            if movedRect.collidelist(walls) == -1:
                 self.rect = movedRect
             movedRect = self.rect.move(0, moveBy.y)
-            if movedRect.collidelist(walls) == -1 and collideClassList(movedRect, NPCs) == -1:
+            if movedRect.collidelist(walls) == -1:
                 self.rect = movedRect
     
     def handleAttack(self, attackInput):
@@ -347,22 +353,33 @@ class Player():
             self.talkInputOnce = True
         if input or self.talking:
             self.talking = False
-            for NPC in NPCs:
-                if pygame.math.Vector2(NPC.rect.topleft).distance_to(pygame.math.Vector2(self.rect.topleft)) < self.talkRadius:
-                    self.talking = True
-                    self.dialogueText = NPC.dialogue[NPC.numTalk]
-                    self.NPCFace = NPC.animations["face"]
-                    break
+            closest = -1
+            for NPC_idx in NPCs:
+                dist = pygame.math.Vector2(NPC_idx.rect.topleft).distance_to(pygame.math.Vector2(self.rect.topleft))
+                if dist < self.talkRadius:
+                    if closest == -1 or dist < closest:
+                        NPC = NPC_idx
+                        closest = dist
+                        self.talking = True
+                        self.dialogueText = NPC_idx.dialogue[NPC.numTalk]
+                        self.NPCFace = NPC_idx.animations["face"]
+                    # break
             if self.talking:
+                if self.talkingIndex > 0.0 and input:
+                    self.talkSpeed = self.talkSpeedFast
+                talkIndexStart = self.talkingIndex
                 self.talkingIndex += self.talkSpeed * dt
                 if self.talkingIndex >= len(self.dialogueText):
                     self.talkingIndex = len(self.dialogueText)
                     if input:
+                        self.talkSpeed = self.talkSpeedNormal
                         self.talkingIndex = 0
                         NPC.numTalk += 1
                         if NPC.numTalk > len(NPC.dialogue) - 1:
                             self.talking = False
                             NPC.numTalk = len(NPC.dialogue) - 1
+                elif self.talkingIndex >= math.ceil(talkIndexStart):
+                    self.talkSounds[random.randint(0, len(self.talkSounds) - 1)].play()
         else:
             self.talkingIndex = 0
     

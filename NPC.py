@@ -7,6 +7,7 @@ spriteSheetVillager2Idle = pygame.image.load("assets/NinjaAdventure/Actor/Charac
 spriteSheetVillager2Walk = pygame.image.load("assets/NinjaAdventure/Actor/Characters/Villager2/SeparateAnim/Walk.png").convert_alpha()
 spriteSheetVillager3Idle = pygame.image.load("assets/NinjaAdventure/Actor/Characters/Villager3/SeparateAnim/Idle.png").convert_alpha()
 spriteSheetVillager3Walk = pygame.image.load("assets/NinjaAdventure/Actor/Characters/Villager3/SeparateAnim/Walk.png").convert_alpha()
+spriteSheetCat = pygame.image.load("assets/NinjaAdventure/Actor/Animals/Cat/SpriteSheet.png").convert_alpha()
 spriteSize = mapTileSize.x
 
 class NPC(pygame.sprite.Sprite):
@@ -48,6 +49,25 @@ class NPC(pygame.sprite.Sprite):
                 "speed": 3
             },
             "face": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Actor/Characters/Villager3/Faceset.png"), (128, 128))
+        },
+        "Cat": {
+            "idle": {
+                "down": [pygame.transform.scale(spriteSheetCat.subsurface(pygame.Rect(spriteSize * 0, spriteSize * 0, spriteSize, spriteSize)), size)],
+                "up": [pygame.transform.scale(spriteSheetCat.subsurface(pygame.Rect(spriteSize * 0, spriteSize * 0, spriteSize, spriteSize)), size)],
+                "left": [pygame.transform.scale(spriteSheetCat.subsurface(pygame.Rect(spriteSize * 0, spriteSize * 0, spriteSize, spriteSize)), size)],
+                "right": [pygame.transform.scale(spriteSheetCat.subsurface(pygame.Rect(spriteSize * 0, spriteSize * 0, spriteSize, spriteSize)), size)],
+                "max": 1,
+                "speed": 0
+            },
+            "walk": {
+                "down": [pygame.transform.scale(spriteSheetCat.subsurface(pygame.Rect(spriteSize * x, spriteSize * 0, spriteSize, spriteSize)), size) for x in range(0, 2)],
+                "up": [pygame.transform.scale(spriteSheetCat.subsurface(pygame.Rect(spriteSize * x, spriteSize * 0, spriteSize, spriteSize)), size) for x in range(0, 2)],
+                "left": [pygame.transform.scale(spriteSheetCat.subsurface(pygame.Rect(spriteSize * x, spriteSize * 0, spriteSize, spriteSize)), size) for x in range(0, 2)],
+                "right": [pygame.transform.scale(spriteSheetCat.subsurface(pygame.Rect(spriteSize * x, spriteSize * 0, spriteSize, spriteSize)), size) for x in range(0, 2)],
+                "max": 2,
+                "speed": 2
+            },
+            "face": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Actor/Animals/Cat/Faceset.png"), (128, 128))
         }
     }
 
@@ -78,6 +98,12 @@ class NPC(pygame.sprite.Sprite):
                 "It's   dangerous   to  go  alone!",
                 "..."
             ]
+        elif self.name == "Cat":
+            self.dialogue = [
+                "meow",
+                "meow   meow    meow!",
+                "*purr*"
+            ]
         else:
             self.dialogue = ["..."]
         
@@ -89,14 +115,14 @@ class NPC(pygame.sprite.Sprite):
 
         self.timers = {
             "walkMax": Timer(3, True),
-            "rest": Timer(2)
+            "rest": Timer(random.randint(10, 50) / 10)
         }
     
     def update(self, dt, walls, talking):
         if not talking:
             if (pygame.math.Vector2(self.rect.topleft).distance_to(self.target) < self.maxSpeed * dt or not self.timers["walkMax"].active) and not self.timers["rest"].active:
                 self.target = pygame.math.Vector2(self.startPos.x + random.randint(-self.targetDistance, self.targetDistance), self.startPos.y + random.randint(-self.targetDistance, self.targetDistance))
-                self.timers["rest"].start()
+                self.timers["rest"].start(random.randint(10, 50) / 10)
 
             if not self.timers["rest"].active:
                 input = pygame.math.Vector2(1, 0).rotate(pygame.math.Vector2(1, 0).angle_to(self.target - pygame.math.Vector2(self.rect.topleft)))

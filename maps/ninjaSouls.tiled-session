@@ -21,15 +21,19 @@
             "scale": 5.442708333333333,
             "selectedLayer": 6,
             "viewCenter": {
-                "x": 108.95311004784688,
+                "x": 92.2334928229665,
                 "y": 119.88516746411483
             }
         },
         "subAreas/Interior2.tmx": {
+            "expandedObjectLayers": [
+                6,
+                5
+            ],
             "scale": 5.442708333333333,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 103.80861244019138,
+                "x": 103.62488038277512,
                 "y": 119.88516746411483
             }
         },
@@ -41,14 +45,18 @@
                 3
             ],
             "scale": 2,
-            "selectedLayer": 5,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 368.25,
-                "y": 271.25
+                "x": 303.5,
+                "y": 270.75
             }
         },
         "tilesets/Beast.tsx": {
             "scaleInDock": 1.5,
+            "scaleInEditor": 1
+        },
+        "tilesets/Cat.tsx": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "tilesets/FacesetBeast.tsx": {
@@ -88,7 +96,7 @@
         }
     },
     "last.externalTilesetPath": "/home/elliott/Documents/python_programs/games/ninjaSouls/maps/tilesets",
-    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Actor/Characters/Villager3",
+    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Actor/Animals/Cat",
     "map.height": 15,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,
@@ -108,6 +116,8 @@
     ],
     "project": "ninjaSouls.tiled-project",
     "recentFiles": [
+        "test.tmx",
+        "tilesets/Cat.tsx",
         "subAreas/Interior2.tmx",
         "tilesets/TilesetWallSimple.tsx",
         "tilesets/TilesetInteriorFloor.tsx",
@@ -117,9 +127,7 @@
         "tilesets/Beast.tsx",
         "tilesets/TilesetNature.tsx",
         "tilesets/TilesetFloorDetail.tsx",
-        "subAreas/Interior1.tmx",
-        "test.tmx",
-        "tilesets/FacesetBeast.tsx"
+        "subAreas/Interior1.tmx"
     ],
     "tileset.lastUsedFilter": "Fichiers de jeu de tuiles Tiled (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx",
