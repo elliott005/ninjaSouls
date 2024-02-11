@@ -5,6 +5,8 @@ from os.path import isfile
 mapTileSize = pygame.math.Vector2(16, 16)
 size = (64, 64)
 
+fontTalk = pygame.font.Font("assets/NinjaAdventure/HUD/Font/NormalFont.ttf", 32)
+
 savePathPlayer = "saves/player.save"
 savePathWorld = "saves/world.save"
 
@@ -20,6 +22,14 @@ def sign(n):
     elif n > 0.0:
         return 1
     return 0
+
+def get_nth_key(dictionary, n=0):
+    if n < 0:
+        n += len(dictionary)
+    for i, key in enumerate(dictionary.keys()):
+        if i == n:
+            return key
+    raise IndexError("dictionary index out of range") 
 
 class Timer:
     def __init__(self, waitTime, active: bool = False, looping: bool = False):
@@ -55,6 +65,12 @@ def collidedictlist(p_rect, p_dict):
             return k
     return "none"
 
+def collideClassList(p_rect, p_list):
+    for i in p_list:
+        if p_rect.colliderect(i.rect):
+            return i
+    return -1
+
 def loadGame(player, Enemy, area=-1):
     if isfile(savePathPlayer) and isfile(savePathWorld):
         area = loadPlayerState(player, area)
@@ -74,6 +90,8 @@ def loadPlayerState(player, area=-1):
     player.health = playerSave["health"]
     player.maxHealth = playerSave["maxHealth"]
     player.weapon = playerSave["weapon"]
+    for weapon in playerSave["weapons"]:
+        player.weapons[weapon]["unlocked"] = playerSave["weapons"][weapon]["unlocked"]
     if area == -1:
         return playerSave["area"]
     else:
@@ -87,8 +105,6 @@ def loadWorldState(Enemy, area):
         enemies = mapLoader.extendedGroup()
         for enemy in worldSave[area]["enemies"]:
             Enemy(enemy["pos"], size, enemy["type"], enemy["dead"], enemies)
-        # for enemy in enemies.sprites():
-        #     print(enemy.trulyDead)
         return enemies, worldSave
     else:
         return -1, worldSave
@@ -116,8 +132,11 @@ def savePlayerState(player, area):
         "health": player.health,
         "maxHealth": player.maxHealth,
         "weapon": player.weapon,
+        "weapons": {},
         "area": area
         }
+    for weapon in player.weapons:
+        playerSave["weapons"][weapon] = {"unlocked": player.weapons[weapon]["unlocked"]}
     with open(savePathPlayer, "wb") as f:
         pickle.dump(playerSave, f)
 
@@ -144,15 +163,47 @@ def transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="rect", dir=1, background
         radius = 1
         if dir < 0:
             radius = dist
+        alpha = 255
         while 1:
-            if radius <= 0 and dir == -1:
-                break
-            elif radius >= dist and dir == 1:
-                break
             dt = fpsClock.get_time() / 1000
-            radius += dt * 700 * dir
+            if radius <= 0 and dir == -1:
+                alpha -= 200 * dt
+            elif radius >= dist and dir == 1:
+                alpha -= 200 * dt
+            else:
+                radius += dt * 700 * dir
             if not background is None:
                 WINDOW.fill(BACKGROUNDCOLOR)
                 WINDOW.blit(background, (0, 0))
-            pygame.draw.circle(WINDOW, (0, 0, 0), (windowSize[0] / 2, windowSize[1] / 2), radius)
+            if alpha <= 0.0:
+                break
+            pygame.draw.circle(WINDOW, (0, 0, 0, alpha), (windowSize[0] / 2, windowSize[1] / 2), radius)
+            pygame.display.update()
+    elif type == "fadeToBlack":
+        alpha = 0
+        rect = pygame.Surface(windowSize, pygame.SRCALPHA)
+        while 1:
+            dt = fpsClock.get_time() / 1000
+            alpha += 200 * dt
+            if not background is None:
+                WINDOW.fill(BACKGROUNDCOLOR)
+                WINDOW.blit(background, (0, 0))
+            if alpha >= 255.0:
+                break
+            rect.fill((0, 0, 0, alpha))
+            WINDOW.blit(rect, (0, 0))
+            pygame.display.update()
+    elif type == "fadeFromBlack":
+        alpha = 255
+        rect = pygame.Surface(windowSize, pygame.SRCALPHA)
+        while 1:
+            dt = fpsClock.get_time() / 1000
+            alpha -= 200 * dt
+            if not background is None:
+                WINDOW.fill(BACKGROUNDCOLOR)
+                WINDOW.blit(background, (0, 0))
+            if alpha <= 0.0:
+                break
+            rect.fill((0, 0, 0, alpha))
+            WINDOW.blit(rect, (0, 0))
             pygame.display.update()

@@ -112,7 +112,7 @@ class Enemy(pygame.sprite.Sprite):
 
         self.aggro = False
     
-    def update(self, dt, playerPos, walls, playerAttackHitbox = -1, *args: Any, **kwargs: Any) -> None:
+    def update(self, dt, playerPos, walls, playerWeapon, playerAttackHitbox = -1, *args: Any, **kwargs: Any) -> None:
         # print(self.trulyDead)
         if self.trulyDead: return
         super().update(*args, **kwargs)
@@ -133,7 +133,7 @@ class Enemy(pygame.sprite.Sprite):
 
         self.image = self.animations[self.animation][self.direction][math.floor(self.currentFrame)]
 
-        self.handleHit(playerAttackHitbox, playerPos)
+        self.handleHit(playerWeapon, playerAttackHitbox, playerPos)
 
         for timer in self.timers:
             self.timers[timer].update(dt)
@@ -207,11 +207,11 @@ class Enemy(pygame.sprite.Sprite):
             self.animation = anim
             self.currentFrame = 0.0
     
-    def handleHit(self, playerAttackHitbox, playerPos):
+    def handleHit(self, playerWeapon, playerAttackHitbox, playerPos):
         if playerAttackHitbox == -1 or self.timers["grace"].active: return
         if self.rect.colliderect(playerAttackHitbox):
             self.sounds["hit"].play()
-            self.health -= 1
+            self.health -= playerWeapon["damage"]
             self.timers["grace"].start()
             self.velocity.rotate_ip(self.velocity.angle_to(pygame.math.Vector2(self.rect.x, self.rect.y) - playerPos))
-            self.velocity = self.velocity.normalize() * self.knockBack
+            self.velocity = self.velocity.normalize() * playerWeapon["knockback"]

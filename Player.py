@@ -80,8 +80,11 @@ class Player():
         self.weaponOffseX = 5
 
         self.weapons = {
-            "Katana": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Katana/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))), "damage": 2}
+            "Katana": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Katana/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))), "damage": 1, "knockback": 700, "unlocked": True},
+            "Axe": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))), "damage": 2, "knockback": 850, "unlocked": True}
         }
+        self.weaponIndex = 0
+        self.weaponIndexMax = 2
 
         for weapon in self.weapons:
             self.weapons[weapon]["spriteDirs"] = {
@@ -96,6 +99,7 @@ class Player():
             "horizontal": pygame.Rect(0, 0, size[0], size[1]),
         }
         self.activeWeaponHitbox = "vertical"
+        self.changeWeaponOnce = False
 
         self.knockback = self.maxSpeed * 3
 
@@ -112,22 +116,45 @@ class Player():
         }
         self.sounds["attack"].set_volume(0.3)
         self.sounds["hit"].set_volume(0.3)
+
+        self.talkRadius = 150
+        self.talking = False
+        self.talkingIndex = 0
+        self.talkSpeed = 15
+        self.dialogueText = ""
+        self.talkInputOnce = False
+        self.NPCFace = -1
+        windowSize = pygame.display.get_window_size()
+        self.dialogBox = pygame.image.load("assets/NinjaAdventure/HUD/Dialog/DialogBox.png")
+        self.dialogBox = pygame.transform.scale(self.dialogBox, (windowSize[0], self.dialogBox.get_height() + 50))
     
-    def update(self, dt, walls, enemiesGroup, inCombat):
+    def update(self, dt, walls, enemiesGroup, NPCs, inCombat):
         keysPressed = pygame.key.get_pressed()
         input = pygame.math.Vector2(checkInput(keysPressed, "moveRight") - checkInput(keysPressed, "moveLeft"), checkInput(keysPressed, "moveDown") - checkInput(keysPressed, "moveUp"))
         
         attackInput = checkInput(keysPressed, "attack")
         if not self.dead:
             self.handleAcceleration(dt, input)
-            self.move(dt, walls)
+            self.move(dt, walls, NPCs)
             self.handleAttack(attackInput)
         self.updateAnimations(dt, input)
 
         self.handleDamage(enemiesGroup)
 
+        self.handleTalk(dt, checkInput(keysPressed, "talk"), NPCs)
+
         self.updateZoom(dt, inCombat)
         self.updateTimers(dt)
+
+        if checkInput(keysPressed, "changeWeapon"):
+            if not self.changeWeaponOnce:
+                self.changeWeaponOnce = True
+                self.weaponIndex += 1
+                if self.weaponIndex >= self.weaponIndexMax:
+                    self.weaponIndex = 0
+                self.weapon = get_nth_key(self.weapons, self.weaponIndex)
+        else:
+            self.changeWeaponOnce = False
 
         if self.health < 1:
             self.dead = True
@@ -171,6 +198,11 @@ class Player():
         
     def drawHUD(self, WINDOW):
         self.handleHealth(WINDOW)
+        if self.talking:
+            windowSize = pygame.display.get_window_size()
+            WINDOW.blit(self.NPCFace, (0, windowSize[1] - self.dialogBox.get_height() - 100))
+            WINDOW.blit(self.dialogBox, (self.NPCFace.get_width(), windowSize[1] - self.dialogBox.get_height() - 100))
+            WINDOW.blit(fontTalk.render(self.dialogueText[:math.floor(self.talkingIndex)], False, (0, 0, 0)), (192, windowSize[1] - self.dialogBox.get_height() / 2 - 125))
 
     def handleAcceleration(self, dt, input):
         if input.y and not self.attacking:
@@ -192,17 +224,17 @@ class Player():
         if input.x != 0 and input.y != 0 and self.velocity.length():
             self.velocity.scale_to_length(self.velocity.length() - self.acceleration * dt / SQRT2)
     
-    def move(self, dt, walls):
+    def move(self, dt, walls, NPCs):
         if self.velocity.length() != 0:
             if self.timers["grace"].active:
                 moveBy = self.velocity * dt
             else:
                 moveBy = self.velocity.normalize() * min(self.velocity.length(), self.maxSpeed) * dt
             movedRect = self.rect.move(moveBy.x, 0)
-            if movedRect.collidelist(walls) == -1:
+            if movedRect.collidelist(walls) == -1 and collideClassList(movedRect, NPCs) == -1:
                 self.rect = movedRect
             movedRect = self.rect.move(0, moveBy.y)
-            if movedRect.collidelist(walls) == -1:
+            if movedRect.collidelist(walls) == -1 and collideClassList(movedRect, NPCs) == -1:
                 self.rect = movedRect
     
     def handleAttack(self, attackInput):
@@ -300,12 +332,39 @@ class Player():
                 if heartsOver == 3:
                     WINDOW.blit(self.heartSprites[1], (i * self.heartSize[0], 0))
                 elif heartsOver == 2:
-                    WINDOW.blit(self.heartSprites[2], (i * self.heartSize[0], 0))
+                    WINDOW.blit(self.heartSprites[2], (i * self.heartSize[0]))
                 else:
                     WINDOW.blit(self.heartSprites[3], (i * self.heartSize[0], 0))
             else:
                 WINDOW.blit(self.heartSprites[4], (i * self.heartSize[0], 0))
-
+    
+    def handleTalk(self, dt, input, NPCs):
+        if not input:
+            self.talkInputOnce = False
+        if input and self.talkInputOnce:
+            input = False
+        if input:
+            self.talkInputOnce = True
+        if input or self.talking:
+            self.talking = False
+            for NPC in NPCs:
+                if pygame.math.Vector2(NPC.rect.topleft).distance_to(pygame.math.Vector2(self.rect.topleft)) < self.talkRadius:
+                    self.talking = True
+                    self.dialogueText = NPC.dialogue[NPC.numTalk]
+                    self.NPCFace = NPC.animations["face"]
+                    break
+            if self.talking:
+                self.talkingIndex += self.talkSpeed * dt
+                if self.talkingIndex >= len(self.dialogueText):
+                    self.talkingIndex = len(self.dialogueText)
+                    if input:
+                        self.talkingIndex = 0
+                        NPC.numTalk += 1
+                        if NPC.numTalk > len(NPC.dialogue) - 1:
+                            self.talking = False
+                            NPC.numTalk = len(NPC.dialogue) - 1
+        else:
+            self.talkingIndex = 0
     
     def updateTimers(self, dt):
         for timer in self.timers:

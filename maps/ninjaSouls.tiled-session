@@ -88,7 +88,7 @@
         }
     },
     "last.externalTilesetPath": "/home/elliott/Documents/python_programs/games/ninjaSouls/maps/tilesets",
-    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Backgrounds/Tilesets/Interior",
+    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Actor/Characters/Villager3",
     "map.height": 15,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,

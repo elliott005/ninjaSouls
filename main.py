@@ -36,9 +36,9 @@ def main():
     enemies, area, worldSave = loadGame(player, Enemy)
     
     if area == "Overworld":
-        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
     else:
-        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
 
     if enemies != -1:
         enemiesGroup = enemies
@@ -68,9 +68,11 @@ def main():
 
         dt = pygame.math.clamp(fpsClock.get_time() / 1000, 0, 0.05)
         
-        dead = player.update(dt, walls, enemiesGroup, playerInCombat)
+        dead = player.update(dt, walls, enemiesGroup, NPCsGroup.sprites(), playerInCombat)
 
-        enemiesGroup.update(dt, pygame.math.Vector2(player.rect.left, player.rect.top), walls, playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1)
+        NPCsGroup.update(dt, walls, player.talking)
+
+        enemiesGroup.update(dt, pygame.math.Vector2(player.rect.left, player.rect.top), walls, player.weapons[player.weapon], playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1)
         playerInCombat = False
         if player.dead:
             if whichMusic != "none":
@@ -98,15 +100,18 @@ def main():
         
         doorEntered = collidedictlist(player.rect, doorAreas)
         if doorEntered != "none":
-            transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle")
+            if not "Overworld" in doorEntered:
+                transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle", background=WINDOW.copy(), dir=1)
+            else:
+                transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeToBlack", background=WINDOW.copy())
             # print("area: ", area)
             saveGame(player, enemiesGroup.sprites(), area, worldSave)
             if "Overworld" in doorEntered:
-                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
                 player.rect.topleft = doorDestinations[doorEntered]
                 enemies, area, worldSave = loadGame(player, Enemy, "Overworld")
             else:
-                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations = changeMap("maps/subAreas/" + doorEntered + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup = changeMap("maps/subAreas/" + doorEntered + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
                 player.rect.topleft = doorDestinations[doorEntered]
                 enemies, area, worldSave = loadGame(player, Enemy, doorEntered)
             
@@ -115,11 +120,16 @@ def main():
 
             WINDOW.fill(BACKGROUNDCOLOR)
             mapSprites.draw(WINDOW, player.rect.center, player.zoom)
+            NPCsGroup.draw(WINDOW, player.rect.center, player.zoom)
             player.draw(WINDOW)
             enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
             mapSpritesFront.draw(WINDOW, player.rect.center, player.zoom)
             player.drawHUD(WINDOW)
-            transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle", dir=-1, background=WINDOW.copy())
+            if "Overworld" in doorEntered:
+                transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle", background=WINDOW.copy(), dir=-1)
+            else:
+                transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeFromBlack", background=WINDOW.copy())
+            # transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle", dir=-1, background=WINDOW.copy())
         # mapSprites.update(player.rect.topleft)
         
         WINDOW.fill(BACKGROUNDCOLOR)
@@ -134,6 +144,7 @@ def main():
 
         mapSprites.draw(WINDOW, player.rect.center, player.zoom)
 
+        NPCsGroup.draw(WINDOW, player.rect.center, player.zoom)
         player.draw(WINDOW)
         enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
 
