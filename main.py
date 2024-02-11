@@ -46,9 +46,19 @@ def main():
     # for enemy in enemiesGroup.sprites():
     #     print(enemy.trulyDead)
     
+    numJoysticksStart = pygame.joystick.get_count()
+    numJoysticks = numJoysticksStart
+    if numJoysticksStart != 0:
+        joystick = pygame.joystick.Joystick(numJoysticksStart - 1)
+        joystick.init()
+    else:
+        joystick = -1
+    
     while 1:
         if dead:
             player.health = player.maxHealth
+            quitgame(player, enemiesGroup.sprites(), area, worldSave)
+        if joystick != -1 and checkInputController(joystick, "quit"):
             quitgame(player, enemiesGroup.sprites(), area, worldSave)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -68,8 +78,16 @@ def main():
                 music[whichMusic].play(loops=-1, fade_ms=1000)
 
         dt = pygame.math.clamp(fpsClock.get_time() / 1000, 0, 0.05)
+
+        numJoysticksStart = numJoysticks
+        numJoysticks = pygame.joystick.get_count()
+        if numJoysticks != numJoysticksStart and numJoysticks != 0:
+            joystick = pygame.joystick.Joystick(numJoysticks - 1)
+            joystick.init()
+        elif numJoysticks == 0:
+            joystick = -1
         
-        dead = player.update(dt, walls, enemiesGroup, NPCsGroup.sprites(), playerInCombat)
+        dead = player.update(dt, joystick, walls, enemiesGroup, NPCsGroup.sprites(), playerInCombat)
 
         NPCsGroup.update(dt, walls, player.talking)
 

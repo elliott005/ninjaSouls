@@ -352,8 +352,8 @@
   <object id="25" x="176" y="32" width="7" height="16"/>
  </objectgroup>
  <objectgroup id="7" name="Doors">
-  <object id="20" name="Interior1" x="128" y="32" width="32" height="16"/>
-  <object id="26" name="Interior2" x="192" y="32" width="16" height="16"/>
+  <object id="20" name="Interior1" x="128" y="32" width="32" height="10"/>
+  <object id="26" name="Interior2" x="192" y="32" width="32" height="10"/>
  </objectgroup>
  <objectgroup id="8" name="DoorDestinations">
   <object id="21" name="Overworld_0" x="130" y="50">

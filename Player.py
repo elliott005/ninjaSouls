@@ -134,11 +134,14 @@ class Player():
         self.dialogBox = pygame.image.load("assets/NinjaAdventure/HUD/Dialog/DialogBox.png")
         self.dialogBox = pygame.transform.scale(self.dialogBox, (windowSize[0], self.dialogBox.get_height() + 50))
     
-    def update(self, dt, walls, enemiesGroup, NPCs, inCombat):
+    def update(self, dt, joystick, walls, enemiesGroup, NPCs, inCombat):
         keysPressed = pygame.key.get_pressed()
-        input = pygame.math.Vector2(checkInput(keysPressed, "moveRight") - checkInput(keysPressed, "moveLeft"), checkInput(keysPressed, "moveDown") - checkInput(keysPressed, "moveUp"))
-        
-        attackInput = checkInput(keysPressed, "attack")
+        if joystick == -1:
+            input = pygame.math.Vector2(checkInput(keysPressed, "moveRight") - checkInput(keysPressed, "moveLeft"), checkInput(keysPressed, "moveDown") - checkInput(keysPressed, "moveUp"))
+            attackInput = checkInput(keysPressed, "attack")
+        else:
+            input = pygame.math.Vector2(checkInputController(joystick, "moveHorizontal"), checkInputController(joystick, "moveVertical"))
+            attackInput = checkInputController(joystick, "attack")
         if not self.dead:
             self.handleAcceleration(dt, input)
             self.move(dt, walls)
@@ -147,12 +150,12 @@ class Player():
 
         self.handleDamage(enemiesGroup)
 
-        self.handleTalk(dt, checkInput(keysPressed, "talk"), NPCs)
+        self.handleTalk(dt, checkInput(keysPressed, "talk") if joystick == -1 else checkInputController(joystick, "talk"), NPCs)
 
         self.updateZoom(dt, inCombat)
         self.updateTimers(dt)
 
-        if checkInput(keysPressed, "changeWeapon"):
+        if (checkInput(keysPressed, "changeWeapon") and joystick == -1) or (joystick != -1 and checkInputController(joystick, "changeWeapon")):
             if not self.changeWeaponOnce:
                 self.changeWeaponOnce = True
                 self.weaponIndex += 1
