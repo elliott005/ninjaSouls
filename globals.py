@@ -91,6 +91,7 @@ def loadPlayerState(player, area=-1):
     player.health = playerSave["health"]
     player.maxHealth = playerSave["maxHealth"]
     player.weapon = playerSave["weapon"]
+    player.equipedItem = playerSave["item"]
     for weapon in playerSave["weapons"]:
         player.weapons[weapon]["unlocked"] = playerSave["weapons"][weapon]["unlocked"]
     for item in playerSave["items"]:
@@ -144,7 +145,8 @@ def savePlayerState(player, area):
         "weapon": player.weapon,
         "weapons": {},
         "area": area,
-        "items": {} 
+        "items": {} ,
+        "item": player.equipedItem
         }
     for weapon in player.weapons:
         playerSave["weapons"][weapon] = {"unlocked": player.weapons[weapon]["unlocked"]}

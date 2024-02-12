@@ -154,7 +154,10 @@ def main():
 
         NPCsGroup.update(dt, walls, player.talking)
 
-        enemiesGroup.update(dt, pygame.math.Vector2(player.rect.left, player.rect.top), walls, player.weapons[player.weapon], playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1)
+        if "hitbox" in player.items[player.equipedItem]:
+            enemiesGroup.update(dt, pygame.math.Vector2(player.rect.left, player.rect.top), walls, player.weapons[player.weapon], playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1, playerSpell = player.items[player.equipedItem] if player.usingItem else -1)
+        else:
+            enemiesGroup.update(dt, pygame.math.Vector2(player.rect.left, player.rect.top), walls, player.weapons[player.weapon], playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1, playerSpell = -1)
         playerInCombat = False
         if player.dead:
             if whichMusic != "none":

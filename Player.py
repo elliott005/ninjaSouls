@@ -135,19 +135,30 @@ class Player():
         self.dialogBox = pygame.image.load("assets/NinjaAdventure/HUD/Dialog/DialogBox.png")
         self.dialogBox = pygame.transform.scale(self.dialogBox, (windowSize[0], self.dialogBox.get_height() + 50))
 
+        plantSpellSpriteSheet = pygame.image.load("assets/NinjaAdventure/FX/Elemental/Plant/SpriteSheet.png")
         self.items = {
+            "plantSpell": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Scroll/ScrollPlant.png"), self.heartSize), "sound": pygame.mixer.Sound("assets/swish-2.wav"), "hitbox": pygame.rect.Rect((0, 0), (size[0] * 2.5, size[1] * 2.5)), "damage": 4, "knockback": 800, "amount": 1, "unlocked": True},
             "potionHealth": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Potion/LifePot.png"), self.heartSize), "healAmount": 4, "amount": 2, "unlocked": True}
         }
         self.equipedItem = "potionHealth"
         self.changeItemOnce = False
         self.itemIndex = 0
-        self.itemIndexMax = 1
+        self.itemIndexMax = 2
+        self.itemPickupSound = pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/PowerUp1.wav")
         self.usingItem = False
-        self.useItemAnim = {
+        plantSpellSpriteSize = 28
+        self.itemAnims = {
+            "plantSpell": {
+                "frames": [pygame.transform.scale(plantSpellSpriteSheet.subsurface(pygame.Rect(plantSpellSpriteSize * x, plantSpellSpriteSize * 0, plantSpellSpriteSize, plantSpellSpriteSize)), (size[0] * 2, size[1] * 2)) for x in range(0, 8)],
+                "max": 8,
+                "speed": 7
+            },
+            "potionHealth": {
                 "frames": [pygame.transform.scale(spriteSheetItem.subsurface(pygame.Rect(deathSize * x, deathSize * 0, deathSize, deathSize)), size) for x in range(0, 4)],
                 "max": 4,
                 "speed": 7
             }
+        }
         self.itemAnimCurrentFrame = 0.0
     
     def update(self, dt, joystick, walls, enemiesGroup, NPCs, inCombat, itemsGroup):
@@ -199,6 +210,8 @@ class Player():
                 self.timers["death"].start()
             self.startDeathTimerOnce = True
             if not self.timers["death"].active:
+                self.direction = "down"
+                self.animation = "idle"
                 return True
         return False
 
@@ -234,9 +247,9 @@ class Player():
         
         if self.usingItem:
             if self.zoom == 1:
-                WINDOW.blit(self.useItemAnim["frames"][math.floor(self.itemAnimCurrentFrame)], (windowSize[0] / 2 - self.rect.width / 2, windowSize[1] / 2 - self.rect.height / 2))
+                WINDOW.blit(self.itemAnims[self.equipedItem]["frames"][math.floor(self.itemAnimCurrentFrame)], (windowSize[0] / 2 - self.rect.width, windowSize[1] / 2 - self.rect.height))
             else:
-                WINDOW.blit(pygame.transform.scale(self.useItemAnim["frames"][math.floor(self.itemAnimCurrentFrame)], (self.rect.width * self.zoom, self.rect.height * self.zoom)), (windowSize[0] / 2 - self.rect.width / 2 + (self.rect.width - self.rect.width * self.zoom) / 2, windowSize[1] / 2 - self.rect.height / 2 + (self.rect.height - self.rect.height * self.zoom) / 2))
+                WINDOW.blit(pygame.transform.scale(self.itemAnims[self.equipedItem]["frames"][math.floor(self.itemAnimCurrentFrame)], (self.rect.width * self.zoom * 2, self.rect.height * self.zoom * 2)), (windowSize[0] / 2 - self.rect.width + (self.rect.width - self.rect.width * self.zoom) / 2, windowSize[1] / 2 - self.rect.height + (self.rect.height - self.rect.height * self.zoom) / 2))
 
     def drawHUD(self, WINDOW):
         self.handleHealth(WINDOW)
@@ -315,14 +328,19 @@ class Player():
             if not item.trulyDead and self.rect.colliderect(item.rect):
                 self.items[item.type]["amount"] += 1
                 item.trulyDead = True
+                self.itemPickupSound.play()
                 break
         if input and not self.usingItem:
             if self.items[self.equipedItem]["amount"] > 0:
                 self.usingItem = True
                 self.items[self.equipedItem]["amount"] -= 1
+                if "hitbox" in self.items[self.equipedItem]:
+                    self.items[self.equipedItem]["sound"].play()
         if self.usingItem:
-            self.itemAnimCurrentFrame += dt * self.useItemAnim["speed"]
-            if self.itemAnimCurrentFrame >= self.useItemAnim["max"]:
+            if "hitbox" in self.items[self.equipedItem]:
+                self.items[self.equipedItem]["hitbox"].center = self.rect.center
+            self.itemAnimCurrentFrame += dt * self.itemAnims[self.equipedItem]["speed"]
+            if self.itemAnimCurrentFrame >= self.itemAnims[self.equipedItem]["max"]:
                 self.itemAnimCurrentFrame = 0.0
                 self.usingItem = False
                 if self.equipedItem == "potionHealth":

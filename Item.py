@@ -3,7 +3,8 @@ from globals import *
 
 class Item(pygame.sprite.Sprite):
     types = {
-        "potionHealth": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Potion/LifePot.png"), (size[0] / 2, size[1] / 2))
+        "potionHealth": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Potion/LifePot.png"), (size[0] / 2, size[1] / 2)),
+        "plantSpell": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Scroll/ScrollPlant.png"), (size[0] / 2, size[1] / 2))
     }
     def __init__(self, pos, type, dead, groups):
         super().__init__(groups)

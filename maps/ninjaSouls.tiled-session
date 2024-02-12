@@ -11,6 +11,14 @@
     ],
     "file.lastUsedOpenFilter": "Tous les Fichiers (*)",
     "fileStates": {
+        "MenuBackground.tmx": {
+            "scale": 2,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 314,
+                "y": 195.75
+            }
+        },
         "subAreas/Interior1.tmx": {
             "expandedObjectLayers": [
                 8,

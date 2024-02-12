@@ -25,6 +25,9 @@ class MainMenu:
         for button in self.buttons:
             self.buttons[button]["sprite"] = pygame.transform.scale(self.buttonImage, self.buttons[button]["size"])
             self.buttons[button]["spriteHovered"] = pygame.transform.scale(self.buttonImageHovered, self.buttons[button]["size"])
+        
+        self.acceptSound = pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Menu/Accept.wav")
+        self.changeHoveredSound = pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Menu/Menu1.wav")
     
     def update(self, joystick):
         keysPressed = pygame.key.get_pressed()
@@ -33,14 +36,17 @@ class MainMenu:
                 self.moveOnce = True
                 if "neighborUp" in self.buttons[self.hovered]:
                     self.hovered = self.buttons[self.hovered]["neighborUp"]
+                    self.changeHoveredSound.play()
         elif ((checkInput(keysPressed, "moveDown") and joystick == -1) or (joystick != -1 and checkInputController(joystick, "moveVertical") > 0.0)):
             if not self.moveOnce:
                 self.moveOnce = True
                 if "neighborDown" in self.buttons[self.hovered]:
                     self.hovered = self.buttons[self.hovered]["neighborDown"]
+                    self.changeHoveredSound.play()
         else:
             self.moveOnce = False
         if ((checkInput(keysPressed, "talk") and joystick == -1) or (joystick != -1 and checkInputController(joystick, "talk"))):
+            self.acceptSound.play()
             return self.hovered
         return False
     
