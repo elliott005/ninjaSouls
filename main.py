@@ -113,7 +113,8 @@ def main():
                     quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), area, worldSave)
                     inMenu = True
         if inMenu:
-            music[whichMusic].fadeout(500)
+            if whichMusic != "none":
+                music[whichMusic].fadeout(500)
             music[menuMusic].play(-1, fade_ms=500)
             pressedQuitButtonOnce = True
             continue
