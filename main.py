@@ -64,6 +64,8 @@ def main():
     menuMusic = "goodTime"
     music[menuMusic].play(-1, fade_ms=500)
     pressedQuitButtonOnce = True
+    mainMenu.draw(WINDOW)
+    transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle", background=WINDOW.copy(), dir=-1)
     
     while 1:
         if inMenu:
@@ -81,6 +83,9 @@ def main():
                         music[menuMusic].fadeout(500)
                         whichMusic = "none"
                         inMenu = False
+                        transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeToBlack", background=WINDOW.copy())
+                        drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup)
+                        transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeFromBlack", background=WINDOW.copy())
                     case "quitGame":
                         pygame.quit()
                         sys.exit()
@@ -95,8 +100,9 @@ def main():
                     if checkInputKey(event.key, "quit"):
                         pygame.quit()
                         sys.exit()
-            WINDOW.fill(BACKGROUNDCOLOR)
-            mainMenu.draw(WINDOW)
+            if not action:
+                WINDOW.fill(BACKGROUNDCOLOR)
+                mainMenu.draw(WINDOW)
             pygame.display.update()
             fpsClock.tick(FPS)
             continue
@@ -117,6 +123,9 @@ def main():
                 music[whichMusic].fadeout(500)
             music[menuMusic].play(-1, fade_ms=500)
             pressedQuitButtonOnce = True
+            transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle", background=WINDOW.copy(), dir=1)
+            mainMenu.draw(WINDOW)
+            transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeFromBlack", background=WINDOW.copy())
             continue
         
         musicArea = collidedictlist(player.rect, musicAreas)
@@ -193,14 +202,7 @@ def main():
             if items != -1:
                 itemsGroup = items
 
-            WINDOW.fill(BACKGROUNDCOLOR)
-            mapSprites.draw(WINDOW, player.rect.center, player.zoom)
-            NPCsGroup.draw(WINDOW, player.rect.center, player.zoom)
-            itemsGroup.draw(WINDOW, player.rect.center, player.zoom)
-            player.draw(WINDOW)
-            enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
-            mapSpritesFront.draw(WINDOW, player.rect.center, player.zoom)
-            player.drawHUD(WINDOW)
+            drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup)
             if "Overworld" in doorEntered:
                 transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle", background=WINDOW.copy(), dir=-1)
             else:
@@ -218,19 +220,20 @@ def main():
         #         pygame.draw.rect(WINDOW, (100, 100, 100), i)
         # pygame.draw.rect(WINDOW, (100, 200, 200), player.rect)
 
-        mapSprites.draw(WINDOW, player.rect.center, player.zoom)
-
-        NPCsGroup.draw(WINDOW, player.rect.center, player.zoom)
-        itemsGroup.draw(WINDOW, player.rect.center, player.zoom)
-        player.draw(WINDOW)
-        enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
-
-        mapSpritesFront.draw(WINDOW, player.rect.center, player.zoom)
-
-        player.drawHUD(WINDOW)
+        drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup)
 
         pygame.display.update()
         fpsClock.tick(FPS)
+
+def drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup):
+    WINDOW.fill(BACKGROUNDCOLOR)
+    mapSprites.draw(WINDOW, player.rect.center, player.zoom)
+    NPCsGroup.draw(WINDOW, player.rect.center, player.zoom)
+    itemsGroup.draw(WINDOW, player.rect.center, player.zoom)
+    player.draw(WINDOW)
+    enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
+    mapSpritesFront.draw(WINDOW, player.rect.center, player.zoom)
+    player.drawHUD(WINDOW)
 
 def quitgame(player, enemies, items, area, worldSave):
     saveGame(player, enemies, items, area, worldSave)

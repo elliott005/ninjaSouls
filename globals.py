@@ -165,12 +165,13 @@ def transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="rect", dir=1, background
             elif rect.x > windowSize[0] and dir == -1:
                 break
             dt = fpsClock.get_time() / 1000
-            rect.x += dt * 500
+            rect.x += dt * 900
             if not background is None:
                 WINDOW.fill(BACKGROUNDCOLOR)
                 WINDOW.blit(background, (0, 0))
             pygame.draw.rect(WINDOW, (0, 0, 0), rect)
             pygame.display.update()
+            fpsClock.tick(30)
     elif type == "circle":
         dist = pygame.math.Vector2(windowSize[0] / 2, windowSize[1] / 2).distance_to(pygame.math.Vector2(0, 0)) + 200
         radius = 1
@@ -180,11 +181,11 @@ def transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="rect", dir=1, background
         while 1:
             dt = fpsClock.get_time() / 1000
             if radius <= 0 and dir == -1:
-                alpha -= 200 * dt
+                alpha -= 300 * dt
             elif radius >= dist and dir == 1:
-                alpha -= 200 * dt
+                alpha -= 300 * dt
             else:
-                radius += dt * 700 * dir
+                radius += dt * 900 * dir
             if not background is None:
                 WINDOW.fill(BACKGROUNDCOLOR)
                 WINDOW.blit(background, (0, 0))
@@ -192,12 +193,13 @@ def transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="rect", dir=1, background
                 break
             pygame.draw.circle(WINDOW, (0, 0, 0, alpha), (windowSize[0] / 2, windowSize[1] / 2), radius)
             pygame.display.update()
+            fpsClock.tick(30)
     elif type == "fadeToBlack":
         alpha = 0
         rect = pygame.Surface(windowSize, pygame.SRCALPHA)
         while 1:
             dt = fpsClock.get_time() / 1000
-            alpha += 200 * dt
+            alpha += 300 * dt
             if not background is None:
                 WINDOW.fill(BACKGROUNDCOLOR)
                 WINDOW.blit(background, (0, 0))
@@ -206,12 +208,13 @@ def transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="rect", dir=1, background
             rect.fill((0, 0, 0, alpha))
             WINDOW.blit(rect, (0, 0))
             pygame.display.update()
+            fpsClock.tick(30)
     elif type == "fadeFromBlack":
         alpha = 255
         rect = pygame.Surface(windowSize, pygame.SRCALPHA)
         while 1:
             dt = fpsClock.get_time() / 1000
-            alpha -= 200 * dt
+            alpha -= 300 * dt
             if not background is None:
                 WINDOW.fill(BACKGROUNDCOLOR)
                 WINDOW.blit(background, (0, 0))
@@ -220,3 +223,4 @@ def transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="rect", dir=1, background
             rect.fill((0, 0, 0, alpha))
             WINDOW.blit(rect, (0, 0))
             pygame.display.update()
+            fpsClock.tick(30)
