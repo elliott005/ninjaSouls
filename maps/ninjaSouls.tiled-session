@@ -45,7 +45,7 @@
                 3
             ],
             "scale": 2,
-            "selectedLayer": 4,
+            "selectedLayer": 7,
             "viewCenter": {
                 "x": 302.5,
                 "y": 270.25
@@ -97,11 +97,11 @@
     },
     "last.externalTilesetPath": "/home/elliott/Documents/python_programs/games/ninjaSouls/maps/tilesets",
     "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Actor/Characters/Villager4",
-    "map.height": 15,
+    "map.height": 60,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,
     "map.tileWidth": 16,
-    "map.width": 15,
+    "map.width": 60,
     "openFiles": [
         "test.tmx",
         "subAreas/Interior1.tmx",

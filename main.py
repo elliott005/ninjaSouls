@@ -14,6 +14,7 @@ from mapLoader import *
 from Player import *
 from Enemy import *
 from Item import *
+from Menu import *
 
 def main():
     overworldMapPath = "maps/test.tmx"
@@ -27,6 +28,7 @@ def main():
         "adventureBegins": pygame.mixer.Sound("assets/NinjaAdventure/Musics/1 - Adventure Begin.ogg"),
         "theCave": pygame.mixer.Sound("assets/NinjaAdventure/Musics/2 - The Cave.ogg"),
         "fight": pygame.mixer.Sound("assets/NinjaAdventure/Musics/17 - Fight.ogg"),
+        "goodTime": pygame.mixer.Sound("assets/NinjaAdventure/Musics/20 - Good Time.ogg"),
     }
     whichMusic = "none"
 
@@ -57,16 +59,64 @@ def main():
     else:
         joystick = -1
     
+    inMenu = True
+    mainMenu = MainMenu(pygame.display.get_window_size())
+    menuMusic = "goodTime"
+    music[menuMusic].play(-1, fade_ms=500)
+    pressedQuitButtonOnce = True
+    
     while 1:
+        if inMenu:
+            numJoysticksStart = numJoysticks
+            numJoysticks = pygame.joystick.get_count()
+            if numJoysticks != numJoysticksStart and numJoysticks != 0:
+                joystick = pygame.joystick.Joystick(numJoysticks - 1)
+                joystick.init()
+            elif numJoysticks == 0:
+                joystick = -1
+            action = mainMenu.update(joystick)
+            if action:
+                match action:
+                    case "startGame":
+                        music[menuMusic].fadeout(500)
+                        whichMusic = "none"
+                        inMenu = False
+                    case "quitGame":
+                        pygame.quit()
+                        sys.exit()
+            if joystick != -1 and checkInputController(joystick, "quit"):
+                if not pressedQuitButtonOnce:
+                    pygame.quit()
+                    sys.exit()
+            else:
+                pressedQuitButtonOnce = False
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if checkInputKey(event.key, "quit"):
+                        pygame.quit()
+                        sys.exit()
+            WINDOW.fill(BACKGROUNDCOLOR)
+            mainMenu.draw(WINDOW)
+            pygame.display.update()
+            fpsClock.tick(FPS)
+            continue
         if dead:
             player.health = player.maxHealth
             quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), area, worldSave)
+            inMenu = True
         if joystick != -1 and checkInputController(joystick, "quit"):
             quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), area, worldSave)
+            inMenu = True
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if checkInputKey(event.key, "quit"):
                     quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), area, worldSave)
+                    inMenu = True
+        if inMenu:
+            music[whichMusic].fadeout(500)
+            music[menuMusic].play(-1, fade_ms=500)
+            pressedQuitButtonOnce = True
+            continue
         
         musicArea = collidedictlist(player.rect, musicAreas)
         # print(musicArea, whichMusic, whichMusic != musicArea)
@@ -183,8 +233,6 @@ def main():
 
 def quitgame(player, enemies, items, area, worldSave):
     saveGame(player, enemies, items, area, worldSave)
-    pygame.quit()
-    sys.exit()
 
 if __name__ == "__main__":
     main()
