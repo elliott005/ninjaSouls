@@ -35,18 +35,6 @@ def main():
     player = Player((100, 100), (64, 64))
     dead = False
     playerInCombat = False
-
-    enemies, items, area, worldSave = loadGame(player, Enemy, Item)
-    
-    if area == "Overworld":
-        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
-    else:
-        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
-
-    if enemies != -1:
-        enemiesGroup = enemies
-    if items != -1:
-        itemsGroup = items
     # print()
     # for enemy in enemiesGroup.sprites():
     #     print(enemy.trulyDead)
@@ -84,6 +72,16 @@ def main():
                         whichMusic = "none"
                         inMenu = False
                         transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeToBlack", background=WINDOW.copy())
+                        enemies, items, area, worldSave = loadGame(player, Enemy, Item)
+                        if area == "Overworld":
+                            mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+                        else:
+                            mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+
+                        if enemies != -1:
+                            enemiesGroup = enemies
+                        if items != -1:
+                            itemsGroup = items
                         drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup)
                         transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeFromBlack", background=WINDOW.copy())
                     case "quitGame":
@@ -107,6 +105,8 @@ def main():
             fpsClock.tick(FPS)
             continue
         if dead:
+            dead = False
+            player.dead = False
             player.health = player.maxHealth
             quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), area, worldSave)
             inMenu = True
