@@ -8,7 +8,9 @@ inputs = {
     "moveDown": [K_DOWN],
     "attack": [K_SPACE],
     "changeWeapon": [K_x],
-    "talk": [K_RETURN]
+    "talk": [K_RETURN],
+    "useItem": [K_c],
+    "changeItem": [K_v]
 }
 inputsController = {
     "quit": [9],
@@ -16,7 +18,9 @@ inputsController = {
     "moveVertical": [1],
     "attack": [1],
     "changeWeapon": [6],
-    "talk": [0]
+    "talk": [0],
+    "useItem": [3],
+    "changeItem": [5]
 }
 
 deadZone = 0.1

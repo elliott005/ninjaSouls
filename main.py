@@ -13,10 +13,11 @@ from inputs import *
 from mapLoader import *
 from Player import *
 from Enemy import *
+from Item import *
 
 def main():
     overworldMapPath = "maps/test.tmx"
-    mapData = load_pygame(overworldMapPath)
+    # mapData = load_pygame(overworldMapPath)
     scaleTo = (64, 64)
     k = pygame.math.Vector2(scaleTo[0] / mapTileSize.x, scaleTo[1] / mapTileSize.y)
 
@@ -33,15 +34,17 @@ def main():
     dead = False
     playerInCombat = False
 
-    enemies, area, worldSave = loadGame(player, Enemy)
+    enemies, items, area, worldSave = loadGame(player, Enemy, Item)
     
     if area == "Overworld":
-        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
     else:
-        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+        mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
 
     if enemies != -1:
         enemiesGroup = enemies
+    if items != -1:
+        itemsGroup = items
     # print()
     # for enemy in enemiesGroup.sprites():
     #     print(enemy.trulyDead)
@@ -57,13 +60,13 @@ def main():
     while 1:
         if dead:
             player.health = player.maxHealth
-            quitgame(player, enemiesGroup.sprites(), area, worldSave)
+            quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), area, worldSave)
         if joystick != -1 and checkInputController(joystick, "quit"):
-            quitgame(player, enemiesGroup.sprites(), area, worldSave)
+            quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), area, worldSave)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if checkInputKey(event.key, "quit"):
-                    quitgame(player, enemiesGroup.sprites(), area, worldSave)
+                    quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), area, worldSave)
         
         musicArea = collidedictlist(player.rect, musicAreas)
         # print(musicArea, whichMusic, whichMusic != musicArea)
@@ -87,7 +90,7 @@ def main():
         elif numJoysticks == 0:
             joystick = -1
         
-        dead = player.update(dt, joystick, walls, enemiesGroup, NPCsGroup.sprites(), playerInCombat)
+        dead = player.update(dt, joystick, walls, enemiesGroup, NPCsGroup.sprites(), playerInCombat, itemsGroup.sprites())
 
         NPCsGroup.update(dt, walls, player.talking)
 
@@ -124,22 +127,25 @@ def main():
             else:
                 transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeToBlack", background=WINDOW.copy())
             # print("area: ", area)
-            saveGame(player, enemiesGroup.sprites(), area, worldSave)
+            saveGame(player, enemiesGroup.sprites(), itemsGroup.sprites(), area, worldSave)
             if "Overworld" in doorEntered:
-                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
                 player.rect.topleft = doorDestinations[doorEntered]
-                enemies, area, worldSave = loadGame(player, Enemy, "Overworld")
+                enemies, items, area, worldSave = loadGame(player, Enemy, Item, "Overworld")
             else:
-                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup = changeMap("maps/subAreas/" + doorEntered + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap("maps/subAreas/" + doorEntered + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
                 player.rect.topleft = doorDestinations[doorEntered]
-                enemies, area, worldSave = loadGame(player, Enemy, doorEntered)
+                enemies, items, area, worldSave = loadGame(player, Enemy, Item, doorEntered)
             
             if enemies != -1:
                 enemiesGroup = enemies
+            if items != -1:
+                itemsGroup = items
 
             WINDOW.fill(BACKGROUNDCOLOR)
             mapSprites.draw(WINDOW, player.rect.center, player.zoom)
             NPCsGroup.draw(WINDOW, player.rect.center, player.zoom)
+            itemsGroup.draw(WINDOW, player.rect.center, player.zoom)
             player.draw(WINDOW)
             enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
             mapSpritesFront.draw(WINDOW, player.rect.center, player.zoom)
@@ -164,6 +170,7 @@ def main():
         mapSprites.draw(WINDOW, player.rect.center, player.zoom)
 
         NPCsGroup.draw(WINDOW, player.rect.center, player.zoom)
+        itemsGroup.draw(WINDOW, player.rect.center, player.zoom)
         player.draw(WINDOW)
         enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
 
@@ -174,8 +181,8 @@ def main():
         pygame.display.update()
         fpsClock.tick(FPS)
 
-def quitgame(player, enemies, area, worldSave):
-    saveGame(player, enemies, area, worldSave)
+def quitgame(player, enemies, items, area, worldSave):
+    saveGame(player, enemies, items, area, worldSave)
     pygame.quit()
     sys.exit()
 

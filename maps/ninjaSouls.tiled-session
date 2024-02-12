@@ -19,7 +19,7 @@
                 7
             ],
             "scale": 5.442708333333333,
-            "selectedLayer": 6,
+            "selectedLayer": 7,
             "viewCenter": {
                 "x": 92.2334928229665,
                 "y": 119.88516746411483
@@ -31,7 +31,7 @@
                 5
             ],
             "scale": 5.442708333333333,
-            "selectedLayer": 5,
+            "selectedLayer": 4,
             "viewCenter": {
                 "x": 103.62488038277512,
                 "y": 119.88516746411483
@@ -47,8 +47,8 @@
             "scale": 2,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 303.5,
-                "y": 270.75
+                "x": 302.5,
+                "y": 270.25
             }
         },
         "tilesets/Beast.tsx": {
@@ -96,7 +96,7 @@
         }
     },
     "last.externalTilesetPath": "/home/elliott/Documents/python_programs/games/ninjaSouls/maps/tilesets",
-    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Actor/Animals/Cat",
+    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Actor/Characters/Villager4",
     "map.height": 15,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,

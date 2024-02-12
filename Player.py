@@ -15,14 +15,15 @@ class Player():
 
         self.zoomMin = 0.6
         self.zoomSpeed = 0.25
-        self.zoomSpeedInCombat = 0.5
+        self.zoomSpeedInCombat = 1
         self.zoom = 1
 
         spriteSize = mapTileSize.x
-        idleSpriteSheet = pygame.image.load("assets/NinjaAdventure/Actor/Characters/BlueNinja/SeparateAnim/Idle.png").convert_alpha()
-        walkSpriteSheet = pygame.image.load("assets/NinjaAdventure/Actor/Characters/BlueNinja/SeparateAnim/Walk.png").convert_alpha()
-        attackSpriteSheet = pygame.image.load("assets/NinjaAdventure/Actor/Characters/BlueNinja/SeparateAnim/Attack.png").convert_alpha()
+        idleSpriteSheet = pygame.image.load("assets/NinjaAdventure/Actor/Characters/GreenNinja/SeparateAnim/Idle.png").convert_alpha()
+        walkSpriteSheet = pygame.image.load("assets/NinjaAdventure/Actor/Characters/GreenNinja/SeparateAnim/Walk.png").convert_alpha()
+        attackSpriteSheet = pygame.image.load("assets/NinjaAdventure/Actor/Characters/GreenNinja/SeparateAnim/Attack.png").convert_alpha()
         spriteSheetDeath = pygame.image.load("assets/NinjaAdventure/FX/Magic/Circle/SpriteSheetOrange.png").convert_alpha()
+        spriteSheetItem = pygame.image.load("assets/NinjaAdventure/FX/Magic/Spirit/SpriteSheetBlue.png").convert_alpha()
         deathSize = 32
         self.animations = {
             "idle": {
@@ -68,7 +69,7 @@ class Player():
 
 
         self.timers = {
-            "zoomOut": Timer(1.0, True),
+            "zoomOut": Timer(2.0, True),
             "attack": Timer(0.5),
             "grace": Timer(0.1),
             "attackCooldown": Timer(1),
@@ -80,8 +81,8 @@ class Player():
         self.weaponOffseX = 5
 
         self.weapons = {
-            "Katana": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Katana/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))), "damage": 1, "knockback": 700, "unlocked": True},
-            "Axe": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))), "damage": 2, "knockback": 850, "unlocked": True}
+            "Katana": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Katana/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))), "damage": 1, "knockback": 500, "unlocked": True},
+            "Axe": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))), "damage": 2, "knockback": 700, "unlocked": True}
         }
         self.weaponIndex = 0
         self.weaponIndexMax = 2
@@ -133,8 +134,23 @@ class Player():
         windowSize = pygame.display.get_window_size()
         self.dialogBox = pygame.image.load("assets/NinjaAdventure/HUD/Dialog/DialogBox.png")
         self.dialogBox = pygame.transform.scale(self.dialogBox, (windowSize[0], self.dialogBox.get_height() + 50))
+
+        self.items = {
+            "potionHealth": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Potion/LifePot.png"), self.heartSize), "healAmount": 4, "amount": 2, "unlocked": True}
+        }
+        self.equipedItem = "potionHealth"
+        self.changeItemOnce = False
+        self.itemIndex = 0
+        self.itemIndexMax = 1
+        self.usingItem = False
+        self.useItemAnim = {
+                "frames": [pygame.transform.scale(spriteSheetItem.subsurface(pygame.Rect(deathSize * x, deathSize * 0, deathSize, deathSize)), size) for x in range(0, 4)],
+                "max": 4,
+                "speed": 7
+            }
+        self.itemAnimCurrentFrame = 0.0
     
-    def update(self, dt, joystick, walls, enemiesGroup, NPCs, inCombat):
+    def update(self, dt, joystick, walls, enemiesGroup, NPCs, inCombat, itemsGroup):
         keysPressed = pygame.key.get_pressed()
         if joystick == -1:
             input = pygame.math.Vector2(checkInput(keysPressed, "moveRight") - checkInput(keysPressed, "moveLeft"), checkInput(keysPressed, "moveDown") - checkInput(keysPressed, "moveUp"))
@@ -146,6 +162,7 @@ class Player():
             self.handleAcceleration(dt, input)
             self.move(dt, walls)
             self.handleAttack(attackInput)
+            self.handleUseItem(dt, checkInput(keysPressed, "useItem") if joystick == -1 else checkInputController(joystick, "useItem"), itemsGroup)
         self.updateAnimations(dt, input)
 
         self.handleDamage(enemiesGroup)
@@ -155,7 +172,7 @@ class Player():
         self.updateZoom(dt, inCombat)
         self.updateTimers(dt)
 
-        if (checkInput(keysPressed, "changeWeapon") and joystick == -1) or (joystick != -1 and checkInputController(joystick, "changeWeapon")):
+        if ((checkInput(keysPressed, "changeWeapon") and joystick == -1) or (joystick != -1 and checkInputController(joystick, "changeWeapon"))):
             if not self.changeWeaponOnce:
                 self.changeWeaponOnce = True
                 self.weaponIndex += 1
@@ -164,6 +181,16 @@ class Player():
                 self.weapon = get_nth_key(self.weapons, self.weaponIndex)
         else:
             self.changeWeaponOnce = False
+        
+        if (checkInput(keysPressed, "changeItem") and joystick == -1) or (joystick != -1 and checkInputController(joystick, "changeItem")):
+            if not self.changeItemOnce and not self.usingItem:
+                self.changeItemOnce = True
+                self.itemIndex += 1
+                if self.itemIndex >= self.itemIndexMax:
+                    self.itemIndex = 0
+                self.equipedItem = get_nth_key(self.items, self.itemIndex)
+        else:
+            self.changeItemOnce = False
 
         if self.health < 1:
             self.dead = True
@@ -205,8 +232,16 @@ class Player():
             elif self.direction == "down":
                 WINDOW.blit(self.weapons[self.weapon]["spriteDirs"][self.direction], (windowSize[0] / 2 - self.weapons[self.weapon]["spriteDirs"][self.direction].get_width() + self.weaponOffseX, windowSize[1] / 2 + self.rect.height / 2))
         
+        if self.usingItem:
+            if self.zoom == 1:
+                WINDOW.blit(self.useItemAnim["frames"][math.floor(self.itemAnimCurrentFrame)], (windowSize[0] / 2 - self.rect.width / 2, windowSize[1] / 2 - self.rect.height / 2))
+            else:
+                WINDOW.blit(pygame.transform.scale(self.useItemAnim["frames"][math.floor(self.itemAnimCurrentFrame)], (self.rect.width * self.zoom, self.rect.height * self.zoom)), (windowSize[0] / 2 - self.rect.width / 2 + (self.rect.width - self.rect.width * self.zoom) / 2, windowSize[1] / 2 - self.rect.height / 2 + (self.rect.height - self.rect.height * self.zoom) / 2))
+
     def drawHUD(self, WINDOW):
         self.handleHealth(WINDOW)
+        WINDOW.blit(self.items[self.equipedItem]["spriteMenu"], (0, 128))
+        WINDOW.blit(fontMenu.render(str(self.items[self.equipedItem]["amount"]), False, (100, 0, 0)), (0, 200))
         if self.talking:
             windowSize = pygame.display.get_window_size()
             WINDOW.blit(self.NPCFace, (0, windowSize[1] - self.dialogBox.get_height() - 100))
@@ -247,7 +282,7 @@ class Player():
                 self.rect = movedRect
     
     def handleAttack(self, attackInput):
-        if self.weapon == "none" or self.zoom != 1:
+        if self.weapon == "none" or self.zoom != 1 or self.usingItem:
             return
         if attackInput and not self.timers["attack"].active and not self.timers["attackCooldown"].active:
             self.attacking = True
@@ -274,6 +309,24 @@ class Player():
                     self.weaponHitboxes[self.activeWeaponHitbox].top = self.rect.bottom
         else:
             self.attacking = False
+        
+    def handleUseItem(self, dt, input, itemsGroup):
+        for item in itemsGroup:
+            if not item.trulyDead and self.rect.colliderect(item.rect):
+                self.items[item.type]["amount"] += 1
+                item.trulyDead = True
+                break
+        if input and not self.usingItem:
+            if self.items[self.equipedItem]["amount"] > 0:
+                self.usingItem = True
+                self.items[self.equipedItem]["amount"] -= 1
+        if self.usingItem:
+            self.itemAnimCurrentFrame += dt * self.useItemAnim["speed"]
+            if self.itemAnimCurrentFrame >= self.useItemAnim["max"]:
+                self.itemAnimCurrentFrame = 0.0
+                self.usingItem = False
+                if self.equipedItem == "potionHealth":
+                    self.health = min(self.health + self.items[self.equipedItem]["healAmount"], self.maxHealth)
     
     def updateAnimations(self, dt, input):
         if not self.dead:

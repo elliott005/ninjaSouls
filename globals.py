@@ -6,6 +6,7 @@ mapTileSize = pygame.math.Vector2(16, 16)
 size = (64, 64)
 
 fontTalk = pygame.font.Font("assets/NinjaAdventure/HUD/Font/NormalFont.ttf", 32)
+fontMenu = pygame.font.Font("assets/NinjaAdventure/HUD/Font/NormalFont.ttf", 128)
 
 savePathPlayer = "saves/player.save"
 savePathWorld = "saves/world.save"
@@ -71,15 +72,15 @@ def collideClassList(p_rect, p_list):
             return i
     return -1
 
-def loadGame(player, Enemy, area=-1):
+def loadGame(player, Enemy, Item, area=-1):
     if isfile(savePathPlayer) and isfile(savePathWorld):
         area = loadPlayerState(player, area)
-        enemies, worldSave = loadWorldState(Enemy, area)
-        return enemies, area, worldSave
+        enemies, items, worldSave = loadWorldState(Enemy, Item, area)
+        return enemies, items, area, worldSave
     else:
         if area == -1:
-            return -1, "Overworld", {}
-        return -1, area, {}
+            return -1, -1, "Overworld", {}
+        return -1, -1, area, {}
 
 def loadPlayerState(player, area=-1):
     with open(savePathPlayer, "rb") as f:
@@ -92,33 +93,42 @@ def loadPlayerState(player, area=-1):
     player.weapon = playerSave["weapon"]
     for weapon in playerSave["weapons"]:
         player.weapons[weapon]["unlocked"] = playerSave["weapons"][weapon]["unlocked"]
+    for item in playerSave["items"]:
+        player.items[item]["unlocked"] =  playerSave["items"][item]["unlocked"]
+        player.items[item]["amount"] =  playerSave["items"][item]["amount"]
     if area == -1:
         return playerSave["area"]
     else:
         return area
 
-def loadWorldState(Enemy, area):
+def loadWorldState(Enemy, Item, area):
     with open(savePathWorld, "rb") as f:
         worldSave = pickle.load(f)
     # print("world: ", area, worldSave)
     if area in worldSave:
         enemies = mapLoader.extendedGroup()
+        items = mapLoader.extendedGroup()
         for enemy in worldSave[area]["enemies"]:
             Enemy(enemy["pos"], size, enemy["type"], enemy["dead"], enemies)
-        return enemies, worldSave
+        for item in worldSave[area]["items"]:
+            Item(item["pos"], item["type"], item["dead"], items)
+        return enemies, items, worldSave
     else:
-        return -1, worldSave
+        return -1, -1, worldSave
 
-def saveGame(player, enemies, area, worldSave):
+def saveGame(player, enemies, itemsGroup, area, worldSave):
     savePlayerState(player, area)
-    return saveWorldState(enemies, area, worldSave)
+    return saveWorldState(enemies, itemsGroup, area, worldSave)
 
-def saveWorldState(enemies, area, worldSave):
+def saveWorldState(enemies, itemsGroup, area, worldSave):
     worldSave[area] = {}
     worldSave[area]["enemies"] = []
+    worldSave[area]["items"] = []
     # print("world before: ", area, worldSave)
     for enemy in enemies:
         worldSave[area]["enemies"].append({"pos": enemy.rect.topleft, "type": enemy.type, "dead": enemy.dead})
+    for item in itemsGroup:
+        worldSave[area]["items"].append({"pos": item.rect.topleft, "type": item.type, "dead": item.trulyDead})
     # print("world after: ", area, worldSave)
     
     with open(savePathWorld, "wb") as f:
@@ -133,10 +143,13 @@ def savePlayerState(player, area):
         "maxHealth": player.maxHealth,
         "weapon": player.weapon,
         "weapons": {},
-        "area": area
+        "area": area,
+        "items": {} 
         }
     for weapon in player.weapons:
         playerSave["weapons"][weapon] = {"unlocked": player.weapons[weapon]["unlocked"]}
+    for item in player.items:
+        playerSave["items"][item] = {"unlocked": player.items[item]["unlocked"], "amount": player.items[item]["amount"]}
     with open(savePathPlayer, "wb") as f:
         pickle.dump(playerSave, f)
 

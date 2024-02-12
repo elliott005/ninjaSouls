@@ -2,6 +2,7 @@ import pygame, math
 from pygame.surface import Surface
 from Enemy import Enemy
 from NPC import NPC
+from Item import Item
 from pytmx.util_pygame import load_pygame
 
 class Tile(pygame.sprite.Sprite):
@@ -41,8 +42,8 @@ class extendedGroup(pygame.sprite.Group):
 
 def changeMap(whichMap, sizeX, sizeY, mapTileSize):
     data = load_pygame(whichMap)
-    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup = loadMap(data, sizeX, sizeY, mapTileSize)
-    return mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup
+    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = loadMap(data, sizeX, sizeY, mapTileSize)
+    return mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup
 
 def loadMap(data, sizeX, sizeY, mapTileSize):
     sprite_group = extendedGroup()
@@ -54,6 +55,7 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
     enemiesGroup = extendedGroup()
     NPCsGroup = extendedGroup()
     tilesets = {}
+    itemsGroup = extendedGroup()
     k = pygame.math.Vector2(sizeX / mapTileSize.x, sizeY / mapTileSize.y)
     for idx, layer in enumerate(data.visible_layers):
         # print(layer.__dict__)
@@ -93,4 +95,7 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
         elif layer.name == "DoorDestinations":
             for obj in layer:
                 doorDestinations[obj.name] = (obj.x * k.x, obj.y * k.y)
-    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup
+        elif layer.name == "Items":
+            for obj in layer:
+                Item((obj.x * k.x, obj.y * k.y), obj.name, False, itemsGroup)
+    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup
