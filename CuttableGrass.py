@@ -1,4 +1,4 @@
-import pygame, math
+import pygame, math, random
 from globals import *
 
 leafSpriteSheet = pygame.image.load("assets/NinjaAdventure/FX/Particle/Grass.png")
@@ -17,6 +17,9 @@ class CuttableGrass(pygame.sprite.Sprite):
         self.angle = 0
         self.turnSpeed = 450
         self.velocity = pygame.math.Vector2(0, -100)
+        self.dropTable = {
+            "heart": 20,
+        }
     
     def update(self, dt, playerAttackHitbox=-1):
         if playerAttackHitbox != -1 and not self.cut:
@@ -31,5 +34,9 @@ class CuttableGrass(pygame.sprite.Sprite):
             if self.currentFrame >= self.maxFrame:
                 self.currentFrame = 0.0
                 self.kill()
+                for drop in self.dropTable:
+                    if random.randint(0, 100) < self.dropTable[drop]:
+                        return self.rect.topleft, drop
             self.image = leafSprites[math.floor(self.currentFrame)]
+        return -1, -1
         

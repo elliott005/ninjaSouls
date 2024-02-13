@@ -153,7 +153,13 @@ def main():
         dead = player.update(dt, joystick, walls, enemiesGroup, NPCsGroup.sprites(), playerInCombat, itemsGroup.sprites())
 
         NPCsGroup.update(dt, walls, player.talking)
-        cuttableGrass.update(dt, playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1)
+        drops = []
+        for grass in cuttableGrass.sprites():
+            dropPos, dropType = grass.update(dt, playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1)
+            if dropType != -1:
+                drops.append((dropPos, dropType))
+        for drop in drops:
+            Item(drop[0], drop[1], False, itemsGroup)
 
         if "hitbox" in player.items[player.equipedItem]:
             enemiesGroup.update(dt, pygame.math.Vector2(player.rect.left, player.rect.top), walls, player.weapons[player.weapon], playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1, playerSpell = player.items[player.equipedItem] if player.usingItem else -1)

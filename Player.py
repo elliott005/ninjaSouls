@@ -331,7 +331,10 @@ class Player():
     def handleUseItem(self, dt, input, itemsGroup):
         for item in itemsGroup:
             if not item.trulyDead and self.rect.colliderect(item.rect):
-                self.items[item.type]["amount"] += 1
+                if item.type == "heart":
+                    self.health = min(self.health + item.healAmount, self.maxHealth)
+                else:
+                    self.items[item.type]["amount"] += 1
                 item.trulyDead = True
                 self.itemPickupSound.play()
                 break
