@@ -112,7 +112,7 @@ def loadWorldState(Enemy, Item, area):
         for enemy in worldSave[area]["enemies"]:
             Enemy(enemy["pos"], size, enemy["type"], enemy["dead"], enemies)
         for item in worldSave[area]["items"]:
-            Item(item["pos"], item["type"], item["dead"], items)
+            Item(item["pos"], item["type"], item["dead"], items, True)
         return enemies, items, worldSave
     else:
         return -1, -1, worldSave

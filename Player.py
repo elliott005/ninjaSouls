@@ -81,8 +81,12 @@ class Player():
         self.weaponOffseX = 5
 
         self.weapons = {
-            "Katana": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Katana/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))), "damage": 1, "knockback": 500, "unlocked": True},
-            "Axe": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))), "damage": 2, "knockback": 700, "unlocked": True}
+            "Katana": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Katana/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))),
+                       "spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Katana/Sprite.png"), self.heartSize),  
+                       "damage": 1, "knockback": 500, "unlocked": True},
+            "Axe": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))),
+                    "spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/Sprite.png"), self.heartSize), 
+                    "damage": 2, "knockback": 700, "unlocked": True}
         }
         self.weaponIndex = 0
         self.weaponIndexMax = 2
@@ -184,7 +188,7 @@ class Player():
         self.updateTimers(dt)
 
         if ((checkInput(keysPressed, "changeWeapon") and joystick == -1) or (joystick != -1 and checkInputController(joystick, "changeWeapon"))):
-            if not self.changeWeaponOnce:
+            if not self.changeWeaponOnce and not self.attacking:
                 self.changeWeaponOnce = True
                 self.weaponIndex += 1
                 if self.weaponIndex >= self.weaponIndexMax:
@@ -255,6 +259,7 @@ class Player():
         self.handleHealth(WINDOW)
         WINDOW.blit(self.items[self.equipedItem]["spriteMenu"], (0, 128))
         WINDOW.blit(fontMenu.render(str(self.items[self.equipedItem]["amount"]), False, (100, 0, 0)), (0, 200))
+        WINDOW.blit(self.weapons[self.weapon]["spriteMenu"], (0, 350))
         if self.talking:
             windowSize = pygame.display.get_window_size()
             WINDOW.blit(self.NPCFace, (0, windowSize[1] - self.dialogBox.get_height() - 100))

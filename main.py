@@ -74,15 +74,15 @@ def main():
                         transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeToBlack", background=WINDOW.copy())
                         enemies, items, area, worldSave = loadGame(player, Enemy, Item)
                         if area == "Overworld":
-                            mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+                            mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
                         else:
-                            mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+                            mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
 
                         if enemies != -1:
                             enemiesGroup = enemies
                         if items != -1:
                             itemsGroup = items
-                        drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup)
+                        drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass)
                         transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeFromBlack", background=WINDOW.copy())
                     case "quitGame":
                         pygame.quit()
@@ -153,6 +153,7 @@ def main():
         dead = player.update(dt, joystick, walls, enemiesGroup, NPCsGroup.sprites(), playerInCombat, itemsGroup.sprites())
 
         NPCsGroup.update(dt, walls, player.talking)
+        cuttableGrass.update(dt, playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1)
 
         if "hitbox" in player.items[player.equipedItem]:
             enemiesGroup.update(dt, pygame.math.Vector2(player.rect.left, player.rect.top), walls, player.weapons[player.weapon], playerAttackHitbox = player.weaponHitboxes[player.activeWeaponHitbox] if player.attacking else -1, playerSpell = player.items[player.equipedItem] if player.usingItem else -1)
@@ -192,11 +193,11 @@ def main():
             # print("area: ", area)
             saveGame(player, enemiesGroup.sprites(), itemsGroup.sprites(), area, worldSave)
             if "Overworld" in doorEntered:
-                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
                 player.rect.topleft = doorDestinations[doorEntered]
                 enemies, items, area, worldSave = loadGame(player, Enemy, Item, "Overworld")
             else:
-                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = changeMap("maps/subAreas/" + doorEntered + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass = changeMap("maps/subAreas/" + doorEntered + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
                 player.rect.topleft = doorDestinations[doorEntered]
                 enemies, items, area, worldSave = loadGame(player, Enemy, Item, doorEntered)
             
@@ -205,7 +206,7 @@ def main():
             if items != -1:
                 itemsGroup = items
 
-            drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup)
+            drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass)
             if "Overworld" in doorEntered:
                 transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle", background=WINDOW.copy(), dir=-1)
             else:
@@ -223,14 +224,15 @@ def main():
         #         pygame.draw.rect(WINDOW, (100, 100, 100), i)
         # pygame.draw.rect(WINDOW, (100, 200, 200), player.rect)
 
-        drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup)
+        drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass)
 
         pygame.display.update()
         fpsClock.tick(FPS)
 
-def drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup):
+def drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass):
     WINDOW.fill(BACKGROUNDCOLOR)
     mapSprites.draw(WINDOW, player.rect.center, player.zoom)
+    cuttableGrass.draw(WINDOW, player.rect.center, player.zoom)
     NPCsGroup.draw(WINDOW, player.rect.center, player.zoom)
     itemsGroup.draw(WINDOW, player.rect.center, player.zoom)
     player.draw(WINDOW)

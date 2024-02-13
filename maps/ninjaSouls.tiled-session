@@ -13,10 +13,25 @@
     "fileStates": {
         "MenuBackground.tmx": {
             "scale": 2,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 314,
+                "x": 313.5,
                 "y": 195.75
+            }
+        },
+        "subAreas/Cave1.tmx": {
+            "expandedObjectLayers": [
+                8,
+                6,
+                5,
+                7,
+                9
+            ],
+            "scale": 2,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 206.75,
+                "y": 244.25
             }
         },
         "subAreas/Interior1.tmx": {
@@ -27,9 +42,9 @@
                 7
             ],
             "scale": 5.442708333333333,
-            "selectedLayer": 7,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 92.2334928229665,
+                "x": 99.49090909090907,
                 "y": 119.88516746411483
             }
         },
@@ -39,10 +54,26 @@
                 5
             ],
             "scale": 5.442708333333333,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 110.69856459330143,
+                "y": 119.88516746411483
+            }
+        },
+        "subAreas/SubAreaTemplate.tmx": {
+            "scale": 2.7213541666666665,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 103.62488038277512,
-                "y": 119.88516746411483
+                "x": 240.1377990430622,
+                "y": 240.1377990430622
+            }
+        },
+        "subAreas/cave1.tmx": {
+            "scale": 1.3606770833333333,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 480.64306220095693,
+                "y": 480.2755980861244
             }
         },
         "test.tmx": {
@@ -50,13 +81,14 @@
                 8,
                 6,
                 7,
-                3
+                3,
+                10
             ],
-            "scale": 2,
-            "selectedLayer": 7,
+            "scale": 2.5,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 302.5,
-                "y": 270.25
+                "x": 220.2,
+                "y": 159
             }
         },
         "tilesets/Beast.tsx": {
@@ -104,7 +136,7 @@
         }
     },
     "last.externalTilesetPath": "/home/elliott/Documents/python_programs/games/ninjaSouls/maps/tilesets",
-    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Actor/Characters/Villager4",
+    "last.imagePath": "/home/elliott/Documents/python_programs/games/ninjaSouls/assets/NinjaAdventure/Backgrounds/Tilesets",
     "map.height": 60,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,
@@ -124,6 +156,8 @@
     ],
     "project": "ninjaSouls.tiled-project",
     "recentFiles": [
+        "subAreas/Cave1.tmx",
+        "subAreas/cave1.tmx",
         "test.tmx",
         "tilesets/Cat.tsx",
         "subAreas/Interior2.tmx",
@@ -133,9 +167,7 @@
         "tilesets/TilesetHouse.tsx",
         "tilesets/Slime.tsx",
         "tilesets/Beast.tsx",
-        "tilesets/TilesetNature.tsx",
-        "tilesets/TilesetFloorDetail.tsx",
-        "subAreas/Interior1.tmx"
+        "tilesets/TilesetNature.tsx"
     ],
     "tileset.lastUsedFilter": "Fichiers de jeu de tuiles Tiled (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx",

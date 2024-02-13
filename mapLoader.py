@@ -3,14 +3,14 @@ from pygame.surface import Surface
 from Enemy import Enemy
 from NPC import NPC
 from Item import Item
+from CuttableGrass import CuttableGrass
 from pytmx.util_pygame import load_pygame
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, pos, size, surf, gid, groups):
+    def __init__(self, pos, size, surf, groups):
         super().__init__(groups)
         self.rect = pygame.Rect(pos, size)
         self.image = pygame.transform.scale(surf, size)
-        self.gid = gid
 
 class extendedGroup(pygame.sprite.Group):
     def draw(self, surface: Surface, playerPos, p_zoom):
@@ -36,14 +36,14 @@ class extendedGroup(pygame.sprite.Group):
                     if bytesStr in scaledImgs:
                         self.spritedict[spr] = surface_blit(scaledImgs[bytesStr], pos)
                     else:
-                        scaledImgs[bytesStr] = pygame.transform.scale(spr.image, (math.ceil(spr.rect.width * zoom), math.ceil(spr.rect.height * zoom)))
+                        scaledImgs[bytesStr] = pygame.transform.scale(spr.image, (math.ceil(spr.image.get_width() * zoom), math.ceil(spr.image.get_width() * zoom)))
                         self.spritedict[spr] = surface_blit(scaledImgs[bytesStr], pos)
         self.lostsprites = []
 
 def changeMap(whichMap, sizeX, sizeY, mapTileSize):
     data = load_pygame(whichMap)
-    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup = loadMap(data, sizeX, sizeY, mapTileSize)
-    return mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup
+    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass = loadMap(data, sizeX, sizeY, mapTileSize)
+    return mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass
 
 def loadMap(data, sizeX, sizeY, mapTileSize):
     sprite_group = extendedGroup()
@@ -56,13 +56,14 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
     NPCsGroup = extendedGroup()
     tilesets = {}
     itemsGroup = extendedGroup()
+    cuttableGrass = extendedGroup()
     k = pygame.math.Vector2(sizeX / mapTileSize.x, sizeY / mapTileSize.y)
     for idx, layer in enumerate(data.visible_layers):
         # print(layer.__dict__)
         if hasattr(layer, "data"):
             if layer.name == "ObjectsFront":
                 for x, y, surf in layer.tiles():
-                    Tile((x * sizeX, y * sizeY), (sizeX, sizeY), surf, data.get_tile_gid(x, y, idx), sprite_group_front)
+                    Tile((x * sizeX, y * sizeY), (sizeX, sizeY), surf, sprite_group_front)
             elif layer.name == "Enemies":
                 for x, y, surf in layer.tiles():
                     gid = data.get_tile_gid(x, y, idx)
@@ -75,10 +76,14 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
                     if not gid in tilesets:
                         tilesets[gid] = data.get_tileset_from_gid(gid)
                     NPC((x * sizeX, y * sizeY), (sizeX, sizeY), tilesets[gid].name, NPCsGroup)
+            elif layer.name == "CuttableGrass":
+                for x, y, surf in layer.tiles():
+                    # print((x * sizeX, y * sizeY))
+                    CuttableGrass((x * sizeX, y * sizeY), (sizeX, sizeY), surf, cuttableGrass)
             else:
                 for x, y, surf in layer.tiles():
                     # print(data.get_tile_gid(x, y, idx))
-                    Tile((x * sizeX, y * sizeY), (sizeX, sizeY), surf, data.get_tile_gid(x, y, idx), sprite_group)
+                    Tile((x * sizeX, y * sizeY), (sizeX, sizeY), surf, sprite_group)
         elif layer.name == "Walls":
             for obj in layer:
                 walls.append(pygame.Rect(obj.x * k.x, obj.y * k.y, obj.width * k.x, obj.height * k.y))
@@ -98,4 +103,4 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
         elif layer.name == "Items":
             for obj in layer:
                 Item((obj.x * k.x, obj.y * k.y), obj.name, False, itemsGroup)
-    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup
+    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass
