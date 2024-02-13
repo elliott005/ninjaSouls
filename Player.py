@@ -86,7 +86,10 @@ class Player():
                        "damage": 1, "knockback": 500, "unlocked": True},
             "Axe": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))),
                     "spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/Sprite.png"), self.heartSize), 
-                    "damage": 2, "knockback": 700, "unlocked": True}
+                    "damage": 2, "knockback": 700, "unlocked": True},
+            "pickaxe": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Pickaxe/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))),
+                    "spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Pickaxe/Sprite.png"), self.heartSize), 
+                    "damage": 1, "knockback": 300, "unlocked": False}
         }
         self.weaponIndex = 0
         self.weaponIndexMax = 2
@@ -142,14 +145,16 @@ class Player():
         plantSpellSpriteSheet = pygame.image.load("assets/NinjaAdventure/FX/Elemental/Plant/SpriteSheet.png")
         self.items = {
             "plantSpell": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Scroll/ScrollPlant.png"), self.heartSize), "sound": pygame.mixer.Sound("assets/swish-2.wav"), "hitbox": pygame.rect.Rect((0, 0), (size[0] * 2.5, size[1] * 2.5)), "damage": 4, "knockback": 800, "amount": 1, "unlocked": True},
-            "potionHealth": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Potion/LifePot.png"), self.heartSize), "healAmount": 4, "amount": 2, "unlocked": True}
+            "potionHealth": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Potion/LifePot.png"), self.heartSize), "healAmount": 4, "amount": 2, "unlocked": True},
+            "coin": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Treasure/GoldCoin.png"), self.heartSize), "amount": 10, "unlocked": True}
         }
         self.equipedItem = "potionHealth"
         self.changeItemOnce = False
         self.itemIndex = 0
-        self.itemIndexMax = 2
+        self.itemIndexMax = 3
         self.itemPickupSound = pygame.mixer.Sound("assets/NinjaAdventure/Sounds/Game/PowerUp1.wav")
         self.usingItem = False
+        self.useItemInputOnce = False
         plantSpellSpriteSize = 28
         self.itemAnims = {
             "plantSpell": {
@@ -194,6 +199,11 @@ class Player():
                 if self.weaponIndex >= self.weaponIndexMax:
                     self.weaponIndex = 0
                 self.weapon = get_nth_key(self.weapons, self.weaponIndex)
+                while not self.weapons[self.weapon]["unlocked"]:
+                    self.weaponIndex += 1
+                    if self.weaponIndex >= self.weaponIndexMax:
+                        self.weaponIndex = 0
+                    self.weapon = get_nth_key(self.weapons, self.weaponIndex)
         else:
             self.changeWeaponOnce = False
         
@@ -329,8 +339,14 @@ class Player():
             self.attacking = False
         
     def handleUseItem(self, dt, input, itemsGroup):
+        if not input:
+            self.useItemInputOnce = False
+        if input and self.useItemInputOnce:
+            input = False
+        if input:
+            self.useItemInputOnce = True
         for item in itemsGroup:
-            if not item.trulyDead and self.rect.colliderect(item.rect):
+            if not item.trulyDead and self.rect.colliderect(item.rect) and item.price == -1:
                 if item.type == "heart":
                     self.health = min(self.health + item.healAmount, self.maxHealth)
                 else:
@@ -339,11 +355,34 @@ class Player():
                 self.itemPickupSound.play()
                 break
         if input and not self.usingItem:
-            if self.items[self.equipedItem]["amount"] > 0:
-                self.usingItem = True
-                self.items[self.equipedItem]["amount"] -= 1
-                if "hitbox" in self.items[self.equipedItem]:
-                    self.items[self.equipedItem]["sound"].play()
+            if self.equipedItem == "coin":
+                closest = -1
+                closestItem = -1
+                for item in itemsGroup:
+                    if not item.trulyDead and item.price != -1:
+                        dist = pygame.math.Vector2(item.rect.topleft).distance_to(pygame.math.Vector2(self.rect.topleft))
+                        if dist < self.talkRadius:
+                            if closest == -1 or dist < closest:
+                                closest = dist
+                                closestItem = item
+                if closestItem != -1:
+                    if closestItem.price <= self.items[self.equipedItem]["amount"]:
+                        if closestItem.category == "weapon":
+                            if not self.weapons[closestItem.type]["unlocked"]:
+                                self.weapons[closestItem.type]["unlocked"] = True
+                                self.weaponIndexMax += 1
+                                self.items[self.equipedItem]["amount"] -= closestItem.price
+                                closestItem.trulyDead = True
+                        elif closestItem.category == "item":
+                            self.items[closestItem.type]["amount"] += closestItem.amount
+                            self.items[self.equipedItem]["amount"] -= closestItem.price
+                            closestItem.trulyDead = True
+            else:
+                if self.items[self.equipedItem]["amount"] > 0:
+                    self.usingItem = True
+                    self.items[self.equipedItem]["amount"] -= 1
+                    if "hitbox" in self.items[self.equipedItem]:
+                        self.items[self.equipedItem]["sound"].play()
         if self.usingItem:
             if "hitbox" in self.items[self.equipedItem]:
                 self.items[self.equipedItem]["hitbox"].center = self.rect.center

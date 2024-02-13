@@ -112,7 +112,7 @@ def loadWorldState(Enemy, Item, area):
         for enemy in worldSave[area]["enemies"]:
             Enemy(enemy["pos"], size, enemy["type"], enemy["dead"], enemies)
         for item in worldSave[area]["items"]:
-            Item(item["pos"], item["type"], item["dead"], items, True)
+            Item(item["pos"], item["type"], item["dead"], items, True, item["price"], item["amount"], item["category"])
         return enemies, items, worldSave
     else:
         return -1, -1, worldSave
@@ -129,7 +129,7 @@ def saveWorldState(enemies, itemsGroup, area, worldSave):
     for enemy in enemies:
         worldSave[area]["enemies"].append({"pos": enemy.rect.topleft, "type": enemy.type, "dead": enemy.dead})
     for item in itemsGroup:
-        worldSave[area]["items"].append({"pos": item.rect.topleft, "type": item.type, "dead": item.trulyDead})
+        worldSave[area]["items"].append({"pos": item.rect.topleft, "type": item.type, "dead": item.trulyDead, "price": item.price, "amount": item.amount, "category": item.category})
     # print("world after: ", area, worldSave)
     
     with open(savePathWorld, "wb") as f:

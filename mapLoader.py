@@ -103,4 +103,7 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
         elif layer.name == "Items":
             for obj in layer:
                 Item((obj.x * k.x, obj.y * k.y), obj.name, False, itemsGroup)
+        elif layer.name == "ItemsPurchase":
+            for obj in layer:
+                Item((obj.x * k.x, obj.y * k.y), obj.name, False, itemsGroup, price=int(obj.type))
     return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass
