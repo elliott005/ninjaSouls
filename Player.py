@@ -76,23 +76,23 @@ class Player():
             "death": Timer(self.animations["dead"]["max"] / self.animations["dead"]["speed"]),
         }
 
-        self.weapon = "Katana"
+        self.weapon = "katana"
         self.attacking = False
         self.weaponOffseX = 5
 
         self.weapons = {
-            "Katana": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Katana/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))),
+            "katana": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Katana/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))),
                        "spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Katana/Sprite.png"), self.heartSize),  
                        "damage": 1, "knockback": 500, "unlocked": True},
-            "Axe": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))),
+            "axe": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))),
                     "spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Axe/Sprite.png"), self.heartSize), 
-                    "damage": 2, "knockback": 700, "unlocked": True},
+                    "damage": 2, "knockback": 700, "unlocked": False},
             "pickaxe": {"sprite": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Pickaxe/SpriteInHand.png"), (math.floor(size[0] / 2), math.floor(size[1] / 2))),
                     "spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Weapons/Pickaxe/Sprite.png"), self.heartSize), 
                     "damage": 1, "knockback": 300, "unlocked": False}
         }
         self.weaponIndex = 0
-        self.weaponIndexMax = 2
+        self.weaponIndexMax = 1
 
         for weapon in self.weapons:
             self.weapons[weapon]["spriteDirs"] = {
@@ -144,9 +144,9 @@ class Player():
 
         plantSpellSpriteSheet = pygame.image.load("assets/NinjaAdventure/FX/Elemental/Plant/SpriteSheet.png")
         self.items = {
-            "plantSpell": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Scroll/ScrollPlant.png"), self.heartSize), "sound": pygame.mixer.Sound("assets/swish-2.wav"), "hitbox": pygame.rect.Rect((0, 0), (size[0] * 2.5, size[1] * 2.5)), "damage": 4, "knockback": 800, "amount": 1, "unlocked": True},
-            "potionHealth": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Potion/LifePot.png"), self.heartSize), "healAmount": 4, "amount": 2, "unlocked": True},
-            "coin": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Treasure/GoldCoin.png"), self.heartSize), "amount": 10, "unlocked": True}
+            "plantSpell": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Scroll/ScrollPlant.png"), self.heartSize), "sound": pygame.mixer.Sound("assets/swish-2.wav"), "hitbox": pygame.rect.Rect((0, 0), (size[0] * 2.5, size[1] * 2.5)), "damage": 4, "knockback": 800, "amount": 0, "unlocked": True},
+            "potionHealth": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Potion/LifePot.png"), self.heartSize), "healAmount": 4, "amount": 1, "unlocked": True},
+            "coin": {"spriteMenu": pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Treasure/GoldCoin.png"), self.heartSize), "amount": 0, "unlocked": True}
         }
         self.equipedItem = "potionHealth"
         self.changeItemOnce = False
@@ -201,7 +201,7 @@ class Player():
                 self.weapon = get_nth_key(self.weapons, self.weaponIndex)
                 while not self.weapons[self.weapon]["unlocked"]:
                     self.weaponIndex += 1
-                    if self.weaponIndex >= self.weaponIndexMax:
+                    if self.weaponIndex >= len(self.weapons):
                         self.weaponIndex = 0
                     self.weapon = get_nth_key(self.weapons, self.weaponIndex)
         else:

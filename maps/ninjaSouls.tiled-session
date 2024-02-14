@@ -28,9 +28,9 @@
                 9
             ],
             "scale": 2,
-            "selectedLayer": 4,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 206.75,
+                "x": 170,
                 "y": 244.25
             }
         },
@@ -42,21 +42,22 @@
                 7
             ],
             "scale": 5.442708333333333,
-            "selectedLayer": 3,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 99.49090909090907,
+                "x": 86.17033492822966,
                 "y": 119.88516746411483
             }
         },
         "subAreas/Interior2.tmx": {
             "expandedObjectLayers": [
                 6,
-                5
+                5,
+                10
             ],
             "scale": 5.442708333333333,
-            "selectedLayer": 3,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 110.69856459330143,
+                "x": 97.19425837320576,
                 "y": 119.88516746411483
             }
         },
@@ -85,9 +86,9 @@
                 10
             ],
             "scale": 2.5,
-            "selectedLayer": 5,
+            "selectedLayer": 7,
             "viewCenter": {
-                "x": 220.2,
+                "x": 190.79999999999998,
                 "y": 159
             }
         },

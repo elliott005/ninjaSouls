@@ -1,5 +1,5 @@
 from typing import Any
-import pygame, math
+import pygame, math, random
 from globals import *
 
 SQRT2 = math.sqrt(2)
@@ -87,6 +87,10 @@ class Enemy(pygame.sprite.Sprite):
             self.health = 2
             self.knockBack = self.maxSpeed * 2.5
             self.activeDistance = 300.0
+            self.dropTable = {
+                "heart": 20,
+                "coin": 30
+            }
         elif self.type == "Slime":
             self.maxSpeed = 300
             self.acceleration = 600
@@ -95,6 +99,10 @@ class Enemy(pygame.sprite.Sprite):
             self.health = 1
             self.knockBack = self.maxSpeed * 3
             self.activeDistance = 600.0
+            self.dropTable = {
+                "heart": 10,
+                "coin": 20
+            }
 
         self.dead = dead
         self.trulyDead = dead
@@ -114,7 +122,7 @@ class Enemy(pygame.sprite.Sprite):
     
     def update(self, dt, playerPos, walls, playerWeapon, playerAttackHitbox = -1, playerSpell = -1, *args: Any, **kwargs: Any) -> None:
         # print(self.trulyDead)
-        if self.trulyDead: return
+        if self.trulyDead: return -1, -1
         super().update(*args, **kwargs)
         input = pygame.math.Vector2(0, 0)
         if not self.dead:
@@ -145,7 +153,12 @@ class Enemy(pygame.sprite.Sprite):
                 self.timers["death"].start()
             self.startTimerOnce = True
             if not self.timers["death"].active:
+                if not self.trulyDead:
+                    for drop in self.dropTable:
+                        if random.randint(0, 100) < self.dropTable[drop]:
+                            return self.rect.topleft, drop
                 self.trulyDead = True
+        return -1, -1
             
     
     def handleAcceleration(self, dt, input):

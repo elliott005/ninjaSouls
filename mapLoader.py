@@ -6,6 +6,12 @@ from Item import Item
 from CuttableGrass import CuttableGrass
 from pytmx.util_pygame import load_pygame
 
+coinSprite = pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Treasure/GoldCoin.png"), (16, 16))
+coinHeight = coinSprite.get_height()
+fontPrice = pygame.font.Font("assets/NinjaAdventure/HUD/Font/NormalFont.ttf", 32)
+priceOffsetY = 32
+priceOffsetX = 8
+
 class Tile(pygame.sprite.Sprite):
     def __init__(self, pos, size, surf, groups):
         super().__init__(groups)
@@ -23,6 +29,9 @@ class extendedGroup(pygame.sprite.Group):
                 if hasattr(spr, "trulyDead") and spr.trulyDead: continue
                 topleft = spr.rect.topleft
                 pos = (topleft[0] - playerPos[0] + windowSize[0] / 2, topleft[1] - playerPos[1] + windowSize[1] / 2)
+                if hasattr(spr, "price") and spr.price != -1:
+                    surface_blit(coinSprite, (pos[0] + priceOffsetX, pos[1] + priceOffsetY))
+                    surface_blit(fontPrice.render(str(spr.price), False, (0, 0, 0)), (pos[0] + priceOffsetX, pos[1] + priceOffsetY + coinHeight))
                 if -spr.rect.width < pos[0] < windowSize[0] and -spr.rect.height < pos[1] < windowSize[1]:
                     self.spritedict[spr] = surface_blit(spr.image, pos)
         else:
@@ -31,6 +40,12 @@ class extendedGroup(pygame.sprite.Group):
                 if hasattr(spr, "trulyDead") and spr.trulyDead: continue
                 topleft = spr.rect.topleft
                 pos = (math.floor((topleft[0] - playerPos[0]) * zoom + windowSize[0] / 2), math.floor((topleft[1] - playerPos[1]) * zoom + windowSize[1] / 2))
+                if hasattr(spr, "price") and spr.price != -1:
+                    posCoin = (math.floor((topleft[0] - playerPos[0] + priceOffsetX) * zoom + windowSize[0] / 2), math.floor((topleft[1] - playerPos[1] + priceOffsetY) * zoom + windowSize[1] / 2))
+                    surface_blit(pygame.transform.scale(coinSprite, (math.ceil(coinSprite.get_width() * zoom), math.ceil(coinHeight * zoom))), posCoin)
+                    price = fontPrice.render(str(spr.price), False, (0, 0, 0))
+                    posPrice = (math.floor((topleft[0] - playerPos[0] + priceOffsetX) * zoom + windowSize[0] / 2), math.floor((topleft[1] - playerPos[1] + priceOffsetY + coinHeight) * zoom + windowSize[1] / 2))
+                    surface_blit(pygame.transform.scale(price, (math.ceil(price.get_width() * zoom), math.ceil(price.get_height() * zoom))), posPrice)
                 if -spr.rect.width < pos[0] < windowSize[0] and -spr.rect.height < pos[1] < windowSize[1]:
                     bytesStr = pygame.image.tobytes(spr.image, "RGB")
                     if bytesStr in scaledImgs:

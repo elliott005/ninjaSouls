@@ -18,7 +18,8 @@ class CuttableGrass(pygame.sprite.Sprite):
         self.turnSpeed = 450
         self.velocity = pygame.math.Vector2(0, -100)
         self.dropTable = {
-            "heart": 20,
+            "heart": 10,
+            "coin": 5
         }
     
     def update(self, dt, playerAttackHitbox=-1):
