@@ -57,13 +57,14 @@ class extendedGroup(pygame.sprite.Group):
 
 def changeMap(whichMap, sizeX, sizeY, mapTileSize):
     data = load_pygame(whichMap)
-    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass = loadMap(data, sizeX, sizeY, mapTileSize)
-    return mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass
+    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks = loadMap(data, sizeX, sizeY, mapTileSize)
+    return mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks
 
 def loadMap(data, sizeX, sizeY, mapTileSize):
     sprite_group = extendedGroup()
     sprite_group_front = extendedGroup()
     walls = []
+    breakableRocks = []
     musicAreas = {}
     doorAreas = {}
     doorDestinations = {}
@@ -102,6 +103,9 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
         elif layer.name == "Walls":
             for obj in layer:
                 walls.append(pygame.Rect(obj.x * k.x, obj.y * k.y, obj.width * k.x, obj.height * k.y))
+        elif layer.name == "BreakableRocks":
+            for obj in layer:
+                breakableRocks.append({"rect": pygame.Rect(obj.x * k.x, obj.y * k.y, obj.width * k.x, obj.height * k.y), "resources": 0})
         elif layer.name == "Music":
             for obj in layer:
                 if not obj.name in musicAreas:
@@ -121,4 +125,4 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
         elif layer.name == "ItemsPurchase":
             for obj in layer:
                 Item((obj.x * k.x, obj.y * k.y), obj.name, False, itemsGroup, price=int(obj.type))
-    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass
+    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks

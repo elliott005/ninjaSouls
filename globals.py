@@ -24,6 +24,12 @@ def sign(n):
         return 1
     return 0
 
+def signNoZero(n):
+    if n < 0.0:
+        return -1
+    else:
+        return 1
+
 def get_nth_key(dictionary, n=0):
     if n < 0:
         n += len(dictionary)
@@ -72,15 +78,21 @@ def collideClassList(p_rect, p_list):
             return i
     return -1
 
+def collidelistdict(p_rect, p_list):
+    for idx, i in enumerate(p_list):
+        if p_rect.colliderect(i["rect"]):
+            return idx
+    return -1
+
 def loadGame(player, Enemy, Item, area=-1):
     if isfile(savePathPlayer) and isfile(savePathWorld):
         area = loadPlayerState(player, area)
-        enemies, items, worldSave = loadWorldState(Enemy, Item, area)
-        return enemies, items, area, worldSave
+        enemies, items, breakableRocks, worldSave = loadWorldState(Enemy, Item, area)
+        return enemies, items, breakableRocks, area, worldSave
     else:
         if area == -1:
-            return -1, -1, "Overworld", {}
-        return -1, -1, area, {}
+            return -1, -1, -1, "Overworld", {}
+        return -1, -1, -1, area, {}
 
 def loadPlayerState(player, area=-1):
     with open(savePathPlayer, "rb") as f:
@@ -109,27 +121,32 @@ def loadWorldState(Enemy, Item, area):
     if area in worldSave:
         enemies = mapLoader.extendedGroup()
         items = mapLoader.extendedGroup()
+        breakableRocks = worldSave[area]["breakableRocks"]
         for enemy in worldSave[area]["enemies"]:
             Enemy(enemy["pos"], size, enemy["type"], enemy["dead"], enemies)
         for item in worldSave[area]["items"]:
             Item(item["pos"], item["type"], item["dead"], items, True, item["price"], item["amount"], item["category"])
-        return enemies, items, worldSave
+        return enemies, items, breakableRocks, worldSave
     else:
-        return -1, -1, worldSave
+        return -1, -1, -1, worldSave
 
-def saveGame(player, enemies, itemsGroup, area, worldSave):
+def saveGame(player, enemies, itemsGroup, breakableRocks, area, worldSave):
     savePlayerState(player, area)
-    return saveWorldState(enemies, itemsGroup, area, worldSave)
+    return saveWorldState(enemies, itemsGroup, breakableRocks, area, worldSave)
 
-def saveWorldState(enemies, itemsGroup, area, worldSave):
+def saveWorldState(enemies, itemsGroup, breakableRocks, area, worldSave):
     worldSave[area] = {}
     worldSave[area]["enemies"] = []
     worldSave[area]["items"] = []
+    worldSave[area]["breakableRocks"] = []
     # print("world before: ", area, worldSave)
     for enemy in enemies:
         worldSave[area]["enemies"].append({"pos": enemy.rect.topleft, "type": enemy.type, "dead": enemy.dead})
     for item in itemsGroup:
-        worldSave[area]["items"].append({"pos": item.rect.topleft, "type": item.type, "dead": item.trulyDead, "price": item.price, "amount": item.amount, "category": item.category})
+        if item.pickupable:
+            worldSave[area]["items"].append({"pos": item.rect.topleft, "type": item.type, "dead": item.trulyDead, "price": item.price, "amount": item.amount, "category": item.category})
+    for rock in breakableRocks:
+        worldSave[area]["breakableRocks"].append(rock)
     # print("world after: ", area, worldSave)
     
     with open(savePathWorld, "wb") as f:

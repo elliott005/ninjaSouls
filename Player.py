@@ -1,6 +1,7 @@
 import pygame, math, random
 from inputs import *
 from globals import *
+from Item import Item
 
 
 SQRT2 = math.sqrt(2)
@@ -94,6 +95,8 @@ class Player():
         self.weaponIndex = 0
         self.weaponIndexMax = 1
 
+        self.hitRockOnce = False
+
         for weapon in self.weapons:
             self.weapons[weapon]["spriteDirs"] = {
                 "down": self.weapons[weapon]["sprite"],
@@ -169,8 +172,13 @@ class Player():
             }
         }
         self.itemAnimCurrentFrame = 0.0
+
+        self.mineMaxAmountNormal = 2
+        self.mineMaxAmountPickaxe = 4
+        self.mineMaxAmount = self.mineMaxAmountNormal
     
-    def update(self, dt, joystick, walls, enemiesGroup, NPCs, inCombat, itemsGroup):
+    def update(self, dt, joystick, walls, enemiesGroup, NPCs, inCombat, itemsGroup, breakableRocks):
+        itemsSprites = itemsGroup.sprites()
         keysPressed = pygame.key.get_pressed()
         if joystick == -1:
             input = pygame.math.Vector2(checkInput(keysPressed, "moveRight") - checkInput(keysPressed, "moveLeft"), checkInput(keysPressed, "moveDown") - checkInput(keysPressed, "moveUp"))
@@ -181,8 +189,8 @@ class Player():
         if not self.dead:
             self.handleAcceleration(dt, input)
             self.move(dt, walls)
-            self.handleAttack(attackInput)
-            self.handleUseItem(dt, checkInput(keysPressed, "useItem") if joystick == -1 else checkInputController(joystick, "useItem"), itemsGroup)
+            self.handleAttack(attackInput, breakableRocks, itemsGroup)
+            self.handleUseItem(dt, checkInput(keysPressed, "useItem") if joystick == -1 else checkInputController(joystick, "useItem"), itemsSprites)
         self.updateAnimations(dt, input)
 
         self.handleDamage(enemiesGroup)
@@ -309,7 +317,21 @@ class Player():
             if movedRect.collidelist(walls) == -1:
                 self.rect = movedRect
     
-    def handleAttack(self, attackInput):
+    def handleAttack(self, attackInput, breakableRocks, itemsGroup):
+        if self.attacking:
+            rock = collidelistdict(self.weaponHitboxes[self.activeWeaponHitbox], breakableRocks)
+            if rock != -1:
+                if self.weapon == "pickaxe":
+                    self.mineMaxAmount = self.mineMaxAmountPickaxe
+                else:
+                    self.mineMaxAmount = self.mineMaxAmountNormal
+                if not self.hitRockOnce and breakableRocks[rock]["resources"] < self.mineMaxAmount:
+                    breakableRocks[rock]["resources"] += 1
+                    self.hitRockOnce = True
+                    dir = signNoZero(random.randint(-10, 10))
+                    Item((breakableRocks[rock]["rect"].centerx - 32 + breakableRocks[rock]["rect"].width / 2 * dir, breakableRocks[rock]["rect"].top - 32), "coin", False, itemsGroup, initialVelocity=pygame.math.Vector2(random.randint(-50, 50), -300), rotation=dir)
+        else:
+            self.hitRockOnce = False
         if self.weapon == "none" or self.zoom != 1 or self.usingItem:
             return
         if attackInput and not self.timers["attack"].active and not self.timers["attackCooldown"].active:
@@ -338,15 +360,15 @@ class Player():
         else:
             self.attacking = False
         
-    def handleUseItem(self, dt, input, itemsGroup):
+    def handleUseItem(self, dt, input, itemsSprites):
         if not input:
             self.useItemInputOnce = False
         if input and self.useItemInputOnce:
             input = False
         if input:
             self.useItemInputOnce = True
-        for item in itemsGroup:
-            if not item.trulyDead and self.rect.colliderect(item.rect) and item.price == -1:
+        for item in itemsSprites:
+            if not item.trulyDead and self.rect.colliderect(item.rect) and item.price == -1 and item.pickupable:
                 if item.type == "heart":
                     self.health = min(self.health + item.healAmount, self.maxHealth)
                 else:
@@ -358,7 +380,7 @@ class Player():
             if self.equipedItem == "coin":
                 closest = -1
                 closestItem = -1
-                for item in itemsGroup:
+                for item in itemsSprites:
                     if not item.trulyDead and item.price != -1:
                         dist = pygame.math.Vector2(item.rect.topleft).distance_to(pygame.math.Vector2(self.rect.topleft))
                         if dist < self.talkRadius:

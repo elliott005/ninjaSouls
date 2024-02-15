@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "test.tmx",
+    "activeFile": "subAreas/Cave1.tmx",
     "expandedProjectPaths": [
+        "tilesets",
         ".",
-        "subAreas",
-        "tilesets"
+        "subAreas"
     ],
     "file.lastUsedOpenFilter": "Tous les Fichiers (*)",
     "fileStates": {
@@ -15,49 +15,50 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 313.5,
-                "y": 195.75
+                "x": 319.75,
+                "y": 199.75
             }
         },
         "subAreas/Cave1.tmx": {
             "expandedObjectLayers": [
-                8,
                 6,
-                5,
+                9,
                 7,
-                9
+                8,
+                5
             ],
             "scale": 2,
-            "selectedLayer": 6,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 170,
-                "y": 244.25
+                "x": 239.75,
+                "y": 239.75
             }
         },
         "subAreas/Interior1.tmx": {
             "expandedObjectLayers": [
-                8,
                 6,
-                5,
-                7
+                9,
+                7,
+                8,
+                5
             ],
             "scale": 5.442708333333333,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 86.17033492822966,
+                "x": 119.88516746411483,
                 "y": 119.88516746411483
             }
         },
         "subAreas/Interior2.tmx": {
             "expandedObjectLayers": [
                 6,
-                5,
-                10
+                10,
+                5
             ],
             "scale": 5.442708333333333,
             "selectedLayer": 6,
             "viewCenter": {
-                "x": 97.19425837320576,
+                "x": 119.88516746411483,
                 "y": 119.88516746411483
             }
         },
@@ -65,8 +66,8 @@
             "scale": 2.7213541666666665,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 240.1377990430622,
-                "y": 240.1377990430622
+                "x": 239.77033492822966,
+                "y": 239.77033492822966
             }
         },
         "subAreas/cave1.tmx": {
@@ -79,26 +80,26 @@
         },
         "test.tmx": {
             "expandedObjectLayers": [
-                8,
                 6,
                 7,
-                3,
-                10
+                10,
+                8,
+                3
             ],
             "scale": 2.5,
             "selectedLayer": 7,
             "viewCenter": {
-                "x": 190.79999999999998,
-                "y": 159
+                "x": 477.8,
+                "y": 630.6
             }
         },
         "tilesets/Beast.tsx": {
             "scaleInDock": 1.5,
-            "scaleInEditor": 1
+            "scaleInEditor": 4
         },
         "tilesets/Cat.tsx": {
-            "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInDock": 1.5,
+            "scaleInEditor": 4
         },
         "tilesets/FacesetBeast.tsx": {
             "scaleInDock": 1,
@@ -106,34 +107,51 @@
         },
         "tilesets/Slime.tsx": {
             "scaleInDock": 1.5,
-            "scaleInEditor": 1
+            "scaleInEditor": 4
         },
         "tilesets/TilesetFloor.tsx": {
-            "scaleInDock": 1.5
+            "scaleInDock": 1.5,
+            "scaleInEditor": 4
         },
         "tilesets/TilesetFloorDetail.tsx": {
             "scaleInDock": 1.5,
-            "scaleInEditor": 1
+            "scaleInEditor": 4
         },
         "tilesets/TilesetHouse.tsx": {
             "scaleInDock": 1.5,
-            "scaleInEditor": 1
+            "scaleInEditor": 4
         },
         "tilesets/TilesetInterior.tsx": {
             "scaleInDock": 1.5,
-            "scaleInEditor": 1
+            "scaleInEditor": 4
         },
         "tilesets/TilesetInteriorFloor.tsx": {
             "scaleInDock": 1.5,
-            "scaleInEditor": 1
+            "scaleInEditor": 4
         },
         "tilesets/TilesetNature.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 1.5,
+            "scaleInEditor": 4
+        },
+        "tilesets/TilesetReliefDetail.tsx": {
+            "scaleInDock": 1.5,
             "scaleInEditor": 1
         },
         "tilesets/TilesetWallSimple.tsx": {
             "scaleInDock": 1.5,
-            "scaleInEditor": 1
+            "scaleInEditor": 4
+        },
+        "tilesets/Villager2.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 4
+        },
+        "tilesets/Villager3.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 4
+        },
+        "tilesets/Villager4.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 4
         }
     },
     "last.externalTilesetPath": "/home/elliott/Documents/python_programs/games/ninjaSouls/maps/tilesets",
@@ -146,6 +164,9 @@
     "openFiles": [
         "test.tmx",
         "subAreas/Interior1.tmx",
+        "subAreas/Interior2.tmx",
+        "subAreas/Cave1.tmx",
+        "subAreas/SubAreaTemplate.tmx",
         "tilesets/TilesetFloorDetail.tsx",
         "tilesets/TilesetNature.tsx",
         "tilesets/Beast.tsx",
@@ -153,22 +174,29 @@
         "tilesets/TilesetHouse.tsx",
         "tilesets/TilesetInterior.tsx",
         "tilesets/TilesetInteriorFloor.tsx",
-        "tilesets/TilesetWallSimple.tsx"
+        "tilesets/TilesetWallSimple.tsx",
+        "tilesets/Villager2.tsx",
+        "tilesets/Villager3.tsx",
+        "tilesets/Cat.tsx",
+        "tilesets/Villager4.tsx",
+        "MenuBackground.tmx",
+        "tilesets/TilesetFloor.tsx",
+        "tilesets/TilesetReliefDetail.tsx"
     ],
     "project": "ninjaSouls.tiled-project",
     "recentFiles": [
-        "subAreas/Cave1.tmx",
-        "subAreas/cave1.tmx",
         "test.tmx",
-        "tilesets/Cat.tsx",
+        "subAreas/Interior1.tmx",
         "subAreas/Interior2.tmx",
+        "tilesets/TilesetReliefDetail.tsx",
+        "tilesets/TilesetFloor.tsx",
+        "MenuBackground.tmx",
+        "tilesets/Villager4.tsx",
+        "tilesets/Cat.tsx",
+        "tilesets/Villager3.tsx",
+        "tilesets/Villager2.tsx",
         "tilesets/TilesetWallSimple.tsx",
-        "tilesets/TilesetInteriorFloor.tsx",
-        "tilesets/TilesetInterior.tsx",
-        "tilesets/TilesetHouse.tsx",
-        "tilesets/Slime.tsx",
-        "tilesets/Beast.tsx",
-        "tilesets/TilesetNature.tsx"
+        "tilesets/TilesetInteriorFloor.tsx"
     ],
     "tileset.lastUsedFilter": "Fichiers de jeu de tuiles Tiled (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx",
