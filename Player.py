@@ -177,7 +177,7 @@ class Player():
         self.mineMaxAmountPickaxe = 4
         self.mineMaxAmount = self.mineMaxAmountNormal
     
-    def update(self, dt, joystick, walls, enemiesGroup, NPCs, inCombat, itemsGroup, breakableRocks):
+    def update(self, dt, joystick, walls, enemiesGroup, NPCs, inCombat, itemsGroup, breakableRocks, treasureChests):
         itemsSprites = itemsGroup.sprites()
         keysPressed = pygame.key.get_pressed()
         if joystick == -1:
@@ -195,7 +195,7 @@ class Player():
 
         self.handleDamage(enemiesGroup)
 
-        self.handleTalk(dt, checkInput(keysPressed, "talk") if joystick == -1 else checkInputController(joystick, "talk"), NPCs)
+        self.handleTalk(dt, checkInput(keysPressed, "talk") if joystick == -1 else checkInputController(joystick, "talk"), NPCs, treasureChests, itemsGroup)
 
         self.updateZoom(dt, inCombat)
         self.updateTimers(dt)
@@ -487,13 +487,27 @@ class Player():
             else:
                 WINDOW.blit(self.heartSprites[4], (i * self.heartSize[0], 0))
     
-    def handleTalk(self, dt, input, NPCs):
+    def handleTalk(self, dt, input, NPCs, treasureChests, itemsGroup):
         if not input:
             self.talkInputOnce = False
         if input and self.talkInputOnce:
             input = False
         if input:
             self.talkInputOnce = True
+        if input:
+            closest = -1
+            closestChest = -1
+            for chest in treasureChests:
+                if chest["open"]: continue
+                dist = pygame.math.Vector2(chest["rect"].topleft).distance_to(pygame.math.Vector2(self.rect.topleft))
+                if dist < self.talkRadius and (closest == -1 or dist < closest):
+                    closest = dist
+                    closestChest = chest
+            if closestChest != -1:
+                closestChest["open"] = True
+                for loot in closestChest["loot"]:
+                    dir = signNoZero(random.randint(-10, 10))
+                    Item((closestChest["rect"].centerx - 32 + closestChest["rect"].width / 2 * dir, closestChest["rect"].top - 32), loot, False, itemsGroup, initialVelocity=pygame.math.Vector2(random.randint(-50, 50), -300), rotation=dir)
         if input or self.talking:
             self.talking = False
             closest = -1

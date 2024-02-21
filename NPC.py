@@ -122,7 +122,7 @@ class NPC(pygame.sprite.Sprite):
         elif self.name == "Villager4":
             self.dialogue = [
                 "hello  there!",
-                "This   is  a   house!",
+                "This   is  a   shop!",
                 "..."
             ]
         elif self.name == "Cat":

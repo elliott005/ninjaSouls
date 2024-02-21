@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="60" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="49">
+<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="60" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="13" nextobjectid="53">
  <tileset firstgid="1" source="tilesets/TilesetFloor.tsx"/>
  <tileset firstgid="573" source="tilesets/TilesetFloorDetail.tsx"/>
  <tileset firstgid="653" source="tilesets/TilesetNature.tsx"/>
@@ -423,6 +423,10 @@
   <object id="46" x="112" y="448" width="64" height="32"/>
   <object id="47" x="0" y="384" width="32" height="32"/>
   <object id="48" x="240" y="16" width="48" height="32"/>
+  <object id="50" x="48" y="96" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="12" name="Chests">
+  <object id="52" name="little_chest_0" type="coin_potionHealth" x="48" y="96" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="10" name="Items">
   <object id="34" name="potionHealth" x="16" y="96">

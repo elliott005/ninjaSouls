@@ -57,14 +57,15 @@ class extendedGroup(pygame.sprite.Group):
 
 def changeMap(whichMap, sizeX, sizeY, mapTileSize):
     data = load_pygame(whichMap)
-    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks = loadMap(data, sizeX, sizeY, mapTileSize)
-    return mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks
+    mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks, treasureChests = loadMap(data, sizeX, sizeY, mapTileSize)
+    return mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks, treasureChests
 
 def loadMap(data, sizeX, sizeY, mapTileSize):
     sprite_group = extendedGroup()
     sprite_group_front = extendedGroup()
     walls = []
     breakableRocks = []
+    treasureChests = []
     musicAreas = {}
     doorAreas = {}
     doorDestinations = {}
@@ -106,6 +107,11 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
         elif layer.name == "BreakableRocks":
             for obj in layer:
                 breakableRocks.append({"rect": pygame.Rect(obj.x * k.x, obj.y * k.y, obj.width * k.x, obj.height * k.y), "resources": 0})
+        elif layer.name == "Chests":
+            for obj in layer:
+                treasureChests.append({"rect": pygame.Rect(obj.x * k.x, obj.y * k.y, obj.width * k.x, obj.height * k.y),
+                                       "little": "little" in obj.name, "open": False,
+                                       "loot": obj.type.split("_")})
         elif layer.name == "Music":
             for obj in layer:
                 if not obj.name in musicAreas:
@@ -125,4 +131,4 @@ def loadMap(data, sizeX, sizeY, mapTileSize):
         elif layer.name == "ItemsPurchase":
             for obj in layer:
                 Item((obj.x * k.x, obj.y * k.y), obj.name, False, itemsGroup, price=int(obj.type))
-    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks
+    return sprite_group, sprite_group_front, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks, treasureChests

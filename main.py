@@ -17,6 +17,9 @@ from Enemy import *
 from Item import *
 from Menu import *
 
+littleChestSprite = pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Treasure/LittleTreasureChest.png").subsurface(pygame.rect.Rect(0, 0, 16, 16)), (64, 64))
+littleChestOpenSprite = pygame.transform.scale(pygame.image.load("assets/NinjaAdventure/Items/Treasure/LittleTreasureChest.png").subsurface(pygame.rect.Rect(16, 0, 16, 16)), (64, 64))
+
 def main():
     overworldMapPath = "maps/test.tmx"
     # mapData = load_pygame(overworldMapPath)
@@ -73,11 +76,11 @@ def main():
                         whichMusic = "none"
                         inMenu = False
                         transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeToBlack", background=WINDOW.copy())
-                        enemies, items, breakableRocksLoad, area, worldSave = loadGame(player, Enemy, Item)
+                        enemies, items, breakableRocksLoad, treasureChestsLoad, area, worldSave = loadGame(player, Enemy, Item)
                         if area == "Overworld":
-                            mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+                            mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks, treasureChests = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
                         else:
-                            mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+                            mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks, treasureChests = changeMap("maps/subAreas/" + area + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
 
                         if enemies != -1:
                             enemiesGroup = enemies
@@ -85,7 +88,10 @@ def main():
                             itemsGroup = items
                         if breakableRocksLoad != -1:
                             breakableRocks = breakableRocksLoad
-                        drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass)
+                        if treasureChestsLoad != -1:
+                            treasureChests = treasureChestsLoad
+                        
+                        drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass, treasureChests)
                         transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeFromBlack", background=WINDOW.copy())
                     case "quitGame":
                         pygame.quit()
@@ -111,15 +117,15 @@ def main():
             dead = False
             player.dead = False
             player.health = player.maxHealth
-            quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), breakableRocks, area, worldSave)
+            quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), breakableRocks, treasureChests, area, worldSave)
             inMenu = True
         if joystick != -1 and checkInputController(joystick, "quit"):
-            quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), breakableRocks, area, worldSave)
+            quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), breakableRocks, treasureChests, area, worldSave)
             inMenu = True
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if checkInputKey(event.key, "quit"):
-                    quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), breakableRocks, area, worldSave)
+                    quitgame(player, enemiesGroup.sprites(), itemsGroup.sprites(), breakableRocks, treasureChests, area, worldSave)
                     inMenu = True
         if inMenu:
             if whichMusic != "none":
@@ -153,7 +159,7 @@ def main():
         elif numJoysticks == 0:
             joystick = -1
         
-        dead = player.update(dt, joystick, walls, enemiesGroup, NPCsGroup.sprites(), playerInCombat, itemsGroup, breakableRocks)
+        dead = player.update(dt, joystick, walls, enemiesGroup, NPCsGroup.sprites(), playerInCombat, itemsGroup, breakableRocks, treasureChests)
 
         itemsGroup.update(dt)
 
@@ -211,15 +217,15 @@ def main():
             else:
                 transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="fadeToBlack", background=WINDOW.copy())
             # print("area: ", area)
-            saveGame(player, enemiesGroup.sprites(), itemsGroup.sprites(), breakableRocks, area, worldSave)
+            saveGame(player, enemiesGroup.sprites(), itemsGroup.sprites(), breakableRocks, treasureChests, area, worldSave)
             if "Overworld" in doorEntered:
-                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
+                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks, treasureChests = changeMap(overworldMapPath, scaleTo[0], scaleTo[1], mapTileSize)
                 player.rect.topleft = doorDestinations[doorEntered]
-                enemies, items, breakableRocksload, area, worldSave = loadGame(player, Enemy, Item, "Overworld")
+                enemies, items, breakableRocksLoad, treasureChestsLoad, area, worldSave = loadGame(player, Enemy, Item, "Overworld")
             else:
-                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks = changeMap("maps/subAreas/" + doorEntered + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
+                mapSprites, mapSpritesFront, enemiesGroup, walls, musicAreas, doorAreas, doorDestinations, NPCsGroup, itemsGroup, cuttableGrass, breakableRocks, treasureChests = changeMap("maps/subAreas/" + doorEntered + ".tmx", scaleTo[0], scaleTo[1], mapTileSize)
                 player.rect.topleft = doorDestinations[doorEntered]
-                enemies, items, breakableRocksLoad, area, worldSave = loadGame(player, Enemy, Item, doorEntered)
+                enemies, items, breakableRocksLoad, treasureChestsLoad, area, worldSave = loadGame(player, Enemy, Item, doorEntered)
             
             if enemies != -1:
                 enemiesGroup = enemies
@@ -227,8 +233,10 @@ def main():
                 itemsGroup = items
             if breakableRocksLoad != -1:
                 breakableRocks = breakableRocksLoad
+            if treasureChestsLoad != -1:
+                treasureChests = treasureChestsLoad
 
-            drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass)
+            drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass, treasureChests)
             if "Overworld" in doorEntered:
                 transition(WINDOW, fpsClock, BACKGROUNDCOLOR, type="circle", background=WINDOW.copy(), dir=-1)
             else:
@@ -246,12 +254,12 @@ def main():
         #         pygame.draw.rect(WINDOW, (100, 100, 100), i)
         # pygame.draw.rect(WINDOW, (100, 200, 200), player.rect)
 
-        drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass)
+        drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass, treasureChests)
 
         pygame.display.update()
         fpsClock.tick(FPS)
 
-def drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass):
+def drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemiesGroup, cuttableGrass, treasureChests):
     WINDOW.fill(BACKGROUNDCOLOR)
     mapSprites.draw(WINDOW, player.rect.center, player.zoom)
     cuttableGrass.draw(WINDOW, player.rect.center, player.zoom)
@@ -259,11 +267,25 @@ def drawWorld(player, mapSprites, mapSpritesFront, NPCsGroup, itemsGroup, enemie
     itemsGroup.draw(WINDOW, player.rect.center, player.zoom)
     player.draw(WINDOW)
     enemiesGroup.draw(WINDOW, player.rect.center, player.zoom)
+
+    windowSize = pygame.display.get_window_size()
+    playerPos = player.rect.center
+    for chest in treasureChests:
+        if chest["little"]:
+            topleft = chest["rect"].topleft
+            if player.zoom != 1:
+                pos = (math.floor((topleft[0] - playerPos[0]) * player.zoom + windowSize[0] / 2), math.floor((topleft[1] - playerPos[1]) * player.zoom + windowSize[1] / 2))
+                spr = pygame.transform.scale(littleChestOpenSprite if chest["open"] else littleChestSprite, (math.ceil(littleChestSprite.get_width() * player.zoom), math.ceil(littleChestSprite.get_width() * player.zoom)))
+                WINDOW.blit(spr, pos)
+            else:
+                pos = (math.floor((topleft[0] - playerPos[0]) + windowSize[0] / 2), math.floor((topleft[1] - playerPos[1]) + windowSize[1] / 2))
+                WINDOW.blit(littleChestOpenSprite if chest["open"] else littleChestSprite, pos)
+
     mapSpritesFront.draw(WINDOW, player.rect.center, player.zoom)
     player.drawHUD(WINDOW)
 
-def quitgame(player, enemies, items, breakableRocks, area, worldSave):
-    saveGame(player, enemies, items, breakableRocks, area, worldSave)
+def quitgame(player, enemies, items, breakableRocks, treasureChests, area, worldSave):
+    saveGame(player, enemies, items, breakableRocks, treasureChests, area, worldSave)
 
 if __name__ == "__main__":
     main()

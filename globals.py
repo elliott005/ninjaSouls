@@ -87,12 +87,12 @@ def collidelistdict(p_rect, p_list):
 def loadGame(player, Enemy, Item, area=-1):
     if isfile(savePathPlayer) and isfile(savePathWorld):
         area = loadPlayerState(player, area)
-        enemies, items, breakableRocks, worldSave = loadWorldState(Enemy, Item, area)
-        return enemies, items, breakableRocks, area, worldSave
+        enemies, items, breakableRocks, teasureChests, worldSave = loadWorldState(Enemy, Item, area)
+        return enemies, items, breakableRocks, teasureChests, area, worldSave
     else:
         if area == -1:
-            return -1, -1, -1, "Overworld", {}
-        return -1, -1, -1, area, {}
+            return -1, -1, -1, -1, "Overworld", {}
+        return -1, -1, -1, -1, area, {}
 
 def loadPlayerState(player, area=-1):
     with open(savePathPlayer, "rb") as f:
@@ -122,23 +122,25 @@ def loadWorldState(Enemy, Item, area):
         enemies = mapLoader.extendedGroup()
         items = mapLoader.extendedGroup()
         breakableRocks = worldSave[area]["breakableRocks"]
+        teasureChests = worldSave[area]["teasureChests"]
         for enemy in worldSave[area]["enemies"]:
             Enemy(enemy["pos"], size, enemy["type"], enemy["dead"], enemies)
         for item in worldSave[area]["items"]:
             Item(item["pos"], item["type"], item["dead"], items, True, item["price"], item["amount"], item["category"])
-        return enemies, items, breakableRocks, worldSave
+        return enemies, items, breakableRocks, teasureChests, worldSave
     else:
-        return -1, -1, -1, worldSave
+        return -1, -1, -1, -1, worldSave
 
-def saveGame(player, enemies, itemsGroup, breakableRocks, area, worldSave):
+def saveGame(player, enemies, itemsGroup, breakableRocks, teasureChests, area, worldSave):
     savePlayerState(player, area)
-    return saveWorldState(enemies, itemsGroup, breakableRocks, area, worldSave)
+    return saveWorldState(enemies, itemsGroup, breakableRocks, teasureChests, area, worldSave)
 
-def saveWorldState(enemies, itemsGroup, breakableRocks, area, worldSave):
+def saveWorldState(enemies, itemsGroup, breakableRocks, teasureChests, area, worldSave):
     worldSave[area] = {}
     worldSave[area]["enemies"] = []
     worldSave[area]["items"] = []
     worldSave[area]["breakableRocks"] = []
+    worldSave[area]["teasureChests"] = teasureChests
     # print("world before: ", area, worldSave)
     for enemy in enemies:
         worldSave[area]["enemies"].append({"pos": enemy.rect.topleft, "type": enemy.type, "dead": enemy.dead})

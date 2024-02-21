@@ -5,8 +5,8 @@
     },
     "activeFile": "subAreas/Cave1.tmx",
     "expandedProjectPaths": [
-        "tilesets",
         ".",
+        "tilesets",
         "subAreas"
     ],
     "file.lastUsedOpenFilter": "Tous les Fichiers (*)",
@@ -15,59 +15,59 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 319.75,
-                "y": 199.75
+                "x": 319.25,
+                "y": 199.25
             }
         },
         "subAreas/Cave1.tmx": {
             "expandedObjectLayers": [
                 6,
-                9,
-                7,
+                5,
                 8,
-                5
+                11,
+                9
             ],
             "scale": 2,
-            "selectedLayer": 4,
+            "selectedLayer": 7,
             "viewCenter": {
-                "x": 239.75,
-                "y": 239.75
+                "x": 276.75,
+                "y": 300.25
             }
         },
         "subAreas/Interior1.tmx": {
             "expandedObjectLayers": [
                 6,
-                9,
+                5,
                 7,
                 8,
-                5
+                9
             ],
             "scale": 5.442708333333333,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 119.88516746411483,
-                "y": 119.88516746411483
+                "x": 116.39425837320576,
+                "y": 119.70143540669856
             }
         },
         "subAreas/Interior2.tmx": {
             "expandedObjectLayers": [
                 6,
-                10,
-                5
+                5,
+                10
             ],
             "scale": 5.442708333333333,
             "selectedLayer": 6,
             "viewCenter": {
-                "x": 119.88516746411483,
-                "y": 119.88516746411483
+                "x": 116.39425837320576,
+                "y": 119.70143540669856
             }
         },
         "subAreas/SubAreaTemplate.tmx": {
             "scale": 2.7213541666666665,
-            "selectedLayer": 4,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 239.77033492822966,
-                "y": 239.77033492822966
+                "x": 239.40287081339716,
+                "y": 239.40287081339713
             }
         },
         "subAreas/cave1.tmx": {
@@ -81,16 +81,17 @@
         "test.tmx": {
             "expandedObjectLayers": [
                 6,
+                12,
                 7,
-                10,
                 8,
+                10,
                 3
             ],
             "scale": 2.5,
-            "selectedLayer": 7,
+            "selectedLayer": 8,
             "viewCenter": {
-                "x": 477.8,
-                "y": 630.6
+                "x": 254.2,
+                "y": 240.2
             }
         },
         "tilesets/Beast.tsx": {
